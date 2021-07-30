@@ -41,27 +41,7 @@ Please note that the mocked LDAP functionality is very limited and many uffd fea
 ## deployment
 
 Use uwsgi. Make sure to run `flask db upgrade` after every update!
-
-### example uwsgi config
-
-```
-[uwsgi]
-plugin = python3
-env = PYTHONIOENCODING=UTF-8
-env = LANG=en_GB.utf8
-env = TZ=Europe/Berlin
-manage-script-name = true
-chdir = /var/www/uffd
-module = uffd:create_app()
-
-uid = uffd
-gid = uffd
-
-vacuum = true
-die-on-term = true
-
-hook-pre-app = exec:FLASK_APP=uffd flask db upgrade
-```
+For an example uwsgi config, see our [uswgi.ini](uwsgi.ini).
 
 ## python style conventions
 
@@ -114,7 +94,7 @@ The userinfo endpoint returns json data with the following structure:
 
 ## Translation
 
-The web frontend is translated in the following Languages:
+The web frontend is initialy written in English and translated in the following Languages:
 
 ![status](https://git.cccv.de/uffd/uffd/badges/master/coverage.svg?job=trans_de&key_text=DE)
 
