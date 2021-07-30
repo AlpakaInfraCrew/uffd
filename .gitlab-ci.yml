@@ -71,3 +71,13 @@ trans_de:
   script:
   - ./update_translations.sh de
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
+
+publish-pip:
+  stage: deploy
+  script:
+  - pip3 install build twine
+  - PACKAGE_VERSION="${CI_COMMIT_TAG#v}" python3 -m build
+  - TWINE_USERNAME="${GITLABPKGS_USERNAME}" TWINE_PASSWORD="${GITLABPKGS_PASSWORD}" python3 -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+  - TWINE_USERNAME="${PYPI_USERNAME}" TWINE_PASSWORD="${PYPI_PASSWORD}" python3 -m twine upload dist/*
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /v[0-9]+[.][0-9]+[.][0-9]+.*/'
