@@ -1,0 +1,19 @@
+Source: uffd
+Section: python
+Priority: optional
+Maintainer: CCCV <it@cccv.de>
+Build-Depends:
+ debhelper-compat (= 12),
+ dh-python,
+ python3-all,
+ python3-setuptools,
+Standards-Version: 4.5.0
+Homepage: https://git.cccv.de/uffd/uffd
+Vcs-Git: https://git.cccv.de/uffd/uffd.git
+
+Package: uffd
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${python3:Depends},
+Description: UserFerwaltungsFrontend: Ldap based single sign on and user management web software

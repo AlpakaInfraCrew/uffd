@@ -81,3 +81,20 @@ publish-pip:
   - TWINE_USERNAME="${PYPI_USERNAME}" TWINE_PASSWORD="${PYPI_PASSWORD}" python3 -m twine upload dist/*
   rules:
     - if: '$CI_COMMIT_TAG =~ /v[0-9]+[.][0-9]+[.][0-9]+.*/'
+
+publish-apt:
+  stage: deploy
+  script:
+    - apt update
+    - apt-get install -y python3-all debhelper python3-pip git-buildpackage
+    - export PYBUILD_INSTALL_ARGS="--install-lib=/usr/share/uffd/ --install-scripts=/usr/share/uffd/"
+    - gbp dch --ignore-branch --debian-tag=v%\(version\)s
+    - dpkg-buildpackage -us -uc
+    - mkdir build
+    - mv ../*.deb build/
+  artifacts:
+    paths:
+      - build/*
+      - debian/changelog
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /v[0-9]+[.][0-9]+[.][0-9]+.*/'
