@@ -35,22 +35,17 @@ role_inclusion = db.Table('role-inclusion',
 	Column('included_role_id', Integer, ForeignKey('role.id'), primary_key=True)
 )
 
-def flatten_recursive(objs, attr):
-	'''Returns a set of objects and all objects included in object.`attr` recursivly while avoiding loops'''
-	objs = set(objs)
-	new_objs = set(objs)
-	while new_objs:
-		for obj in getattr(new_objs.pop(), attr):
-			if obj not in objs:
-				objs.add(obj)
-				new_objs.add(obj)
-	return objs
-
 def get_user_roles_effective(user):
-	base = set(user.roles)
-	if not user.is_service_user:
-		base.update(Role.query.filter_by(is_default=True))
-	return flatten_recursive(base, 'included_roles')
+	direct_roles = db.session.query(Role).join(RoleUser)\
+	                                     .filter(RoleUser.dn == user.dn)
+	# pylint: disable=singleton-comparison
+	base_roles = db.session.query(Role).filter(db.and_(Role.is_default == True,
+	                                                   user.is_service_user is False))
+	cte = direct_roles.union(base_roles).cte('cte', recursive=True)
+	rquery = cte.union(db.session.query(Role)\
+			.join(role_inclusion, Role.id == role_inclusion.c.included_role_id)\
+			.join(cte, role_inclusion.c.role_id == cte.c.role_id))
+	return set(Role.query.join(rquery, rquery.c.role_id == Role.id).all())
 
 User.roles_effective = property(get_user_roles_effective)
 
@@ -115,8 +110,14 @@ class Role(db.Model):
 
 	@property
 	def members_effective(self):
+		cte = db.session.query(Role).filter(Role.id == self.id)\
+		                            .cte('cte', recursive=True)
+		rquery = cte.union(db.session.query(Role)\
+				.join(role_inclusion, Role.id == role_inclusion.c.role_id)\
+				.join(cte, role_inclusion.c.included_role_id == cte.c.id))
+		including_roles_recursive = Role.query.join(rquery, rquery.c.id == Role.id).all()
 		members = set()
-		for role in flatten_recursive([self], 'including_roles'):
+		for role in including_roles_recursive:
 			members.update(role.members)
 			if role.is_default:
 				members.update([user for user in User.query.all() if not user.is_service_user])
@@ -124,7 +125,14 @@ class Role(db.Model):
 
 	@property
 	def included_roles_recursive(self):
-		return flatten_recursive(self.included_roles, 'included_roles')
+		cte = db.session.query(Role)\
+				.join(role_inclusion, Role.id == role_inclusion.c.included_role_id)\
+				.filter(role_inclusion.c.role_id == self.id)\
+				.cte('cte', recursive=True)
+		rquery = cte.union(db.session.query(Role)\
+				.join(role_inclusion, Role.id == role_inclusion.c.included_role_id)\
+				.join(cte, role_inclusion.c.role_id == cte.c.id))
+		return set(Role.query.join(rquery, rquery.c.id == Role.id).all())
 
 	@property
 	def groups_effective(self):

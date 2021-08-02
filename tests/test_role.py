@@ -9,31 +9,11 @@ from uffd.ldap import ldap
 from uffd import user
 
 from uffd.user.models import User, Group
-from uffd.role.models import flatten_recursive, Role, RoleGroup
+from uffd.role.models import Role, RoleGroup
 from uffd.mfa.models import TOTPMethod
 from uffd import create_app, db
 
 from utils import dump, UffdTestCase
-
-class TestPrimitives(unittest.TestCase):
-	def test_flatten_recursive(self):
-		class Node:
-			def __init__(self, *neighbors):
-				self.neighbors = set(neighbors or set())
-
-		cycle = Node()
-		cycle.neighbors.add(cycle)
-		common = Node(cycle)
-		intermediate1 = Node(common)
-		intermediate2 = Node(common, intermediate1)
-		stub = Node()
-		backref = Node()
-		start1 = Node(intermediate1, intermediate2, stub, backref)
-		backref.neighbors.add(start1)
-		start2 = Node()
-		self.assertSetEqual(flatten_recursive({start1, start2}, 'neighbors'),
-		                    {start1, start2, backref, stub, intermediate1, intermediate2, common, cycle})
-		self.assertSetEqual(flatten_recursive(set(), 'neighbors'), set())
 
 class TestUserRoleAttributes(UffdTestCase):
 	def test_roles_effective(self):
@@ -103,6 +83,8 @@ class TestRoleModel(UffdTestCase):
 		included_role = Role(name='included')
 		direct_role = Role(name='direct', members=[user1, user2, service], included_roles=[included_role])
 		empty_role = Role(name='empty', included_roles=[included_role])
+		db.session.add_all([included_by_default_role, default_role, included_role, direct_role, empty_role])
+		db.session.commit()
 		self.assertSetEqual(included_by_default_role.members_effective, {user1, user2})
 		self.assertSetEqual(default_role.members_effective, {user1, user2})
 		self.assertSetEqual(included_role.members_effective, {user1, user2, service})
@@ -116,10 +98,13 @@ class TestRoleModel(UffdTestCase):
 		role1 = Role(name='role1', included_roles=[baserole])
 		role2 = Role(name='role2', included_roles=[baserole])
 		role3 = Role(name='role3', included_roles=[role1, role2])
+		db.session.add_all([baserole, role1, role2, role3])
+		db.session.commit()
 		self.assertSetEqual(role1.included_roles_recursive, {baserole})
 		self.assertSetEqual(role2.included_roles_recursive, {baserole})
 		self.assertSetEqual(role3.included_roles_recursive, {baserole, role1, role2})
 		baserole.included_roles.append(role1)
+		db.session.commit()
 		self.assertSetEqual(role3.included_roles_recursive, {baserole, role1, role2})
 
 	def test_groups_effective(self):
@@ -127,6 +112,8 @@ class TestRoleModel(UffdTestCase):
 		group2 = self.get_access_group()
 		baserole = Role(name='base', groups={group1: RoleGroup(group=group1)})
 		role1 = Role(name='role1', groups={group2: RoleGroup(group=group2)}, included_roles=[baserole])
+		db.session.add_all([baserole, role1])
+		db.session.commit()
 		self.assertSetEqual(baserole.groups_effective, {group1})
 		self.assertSetEqual(role1.groups_effective, {group1, group2})
 
@@ -141,6 +128,7 @@ class TestRoleModel(UffdTestCase):
 		baserole = Role(name='base', members=[user1], groups={group1: RoleGroup(group=group1)})
 		role1 = Role(name='role1', members=[user2], groups={group2: RoleGroup(group=group2)}, included_roles=[baserole])
 		db.session.add_all([baserole, role1])
+		db.session.commit()
 		baserole.update_member_groups()
 		role1.update_member_groups()
 		self.assertSetEqual(set(user1.groups), {group1})
