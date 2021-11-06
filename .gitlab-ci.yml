@@ -1,12 +1,13 @@
 image: registry.git.cccv.de/uffd/docker-images/buster
 
 variables:
-  DEBIAN_FRONTEND: noninteractive 
+  DEBIAN_FRONTEND: noninteractive
   GIT_SUBMODULE_STRATEGY: normal
   PYTHONPATH: deps/ldapalchemy
   APT_API_URL: https://packages.cccv.de
   APT_REPO: uffd
   PYLINT_PIN: pylint~=2.10.0
+  DOCKER_IMAGE_TAG: latest
 
 before_script:
   - python3 -V
@@ -39,6 +40,20 @@ build:apt:
   artifacts:
     paths:
     - ./*.deb
+
+build:docker:
+  extends: .build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script: []
+  script:
+    - mkdir -p /kaniko/.docker
+    - /kaniko/executor --force --use-new-run --context $CI_PROJECT_DIR --no-push --destination $CI_REGISTRY_IMAGE --tarPath image.tar
+  artifacts:
+    paths:
+    - image.tar
+    when: on_success
 
 db_migrations_updated:
   stage: test
@@ -221,3 +236,15 @@ publish:apt:
   - 'curl --user "${APTLY_API_USER}:${APTLY_API_PW}" -X PUT -H "Content-Type: application/json" --data "{ }" "${APT_API_URL}/api/publish/uffd/bullseye"'
   dependencies:
   - build:apt
+
+publish:docker:
+  extends: .publish
+  image:
+    name: gcr.io/go-containerregistry/crane:debug
+    entrypoint: [""]
+  before_script: []
+  script:
+  - crane auth login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - crane push image.tar $CI_REGISTRY_IMAGE:$DOCKER_IMAGE_TAG
+  needs:
+  - build:docker
