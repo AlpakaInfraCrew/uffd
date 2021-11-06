@@ -1,0 +1,44 @@
+version: "3"
+
+networks:
+  uffd: {}
+
+volumes:
+  static-files: {}
+  data: {}
+
+services:
+  database:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecret
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: uffd
+    volumes:
+      - data:/var/lib/mysql
+    networks:
+      - uffd
+
+  uffd-python:
+    image: registry.git.cccv.de/uffd/uffd
+    environment:
+      UFFD_SECRET_KEY: supersecret
+      UFFD_INITIAL_ADMIN_USER: myadmin
+      UFFD_INITIAL_ADMIN_PW: S3cr3tS3cr3t!
+      UFFD_INITIAL_ADMIN_MAIL: myadmin@example.com
+    volumes:
+      - static-files:/var/www/uffd
+      - ./uffd.cfg:/etc/uffd/uffd.cfg:ro
+    networks:
+      - uffd
+
+  nginx:
+    image: nginx
+    volumes:
+      - static-files:/var/www/uffd
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    networks:
+      - uffd

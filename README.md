@@ -71,6 +71,25 @@ The Debian package uses uwsgi to run uffd and ships an `uffd-admin` to execute f
 If you upgrade, make sure to run `flask db upgrade` after every update! The Debian package takes care of this by itself using uwsgi pre start hooks.
 For an example uwsgi config, see our [uswgi.ini](uwsgi.ini). You might find our [nginx include file](nginx.include.conf) helpful to setup a web server in front of uwsgi.
 
+### Docker-based deployment
+
+To deploy uffd using docker, you can use the docker container `registry.git.cccv.de/uffd/uffd`.
+See <https://git.cccv.de/uffd/uffd/container_registry> for available tags.
+
+The container copies the static files to `/var/www/uffd`, runs database migrations, optionally creates an initial admin user,
+and finally runs the software using a uwsgi server.
+The api can be accessed through a uwsgi socket on port 3031.
+To deploy the software, a seperate http server (e.g. nginx) is required.
+
+See [examples/docker/basic-docker-compose.yml](examples/docker/basic-docker-compose.yml) for a minimal running setup.
+It uses a sqlite database in the volume `data`.
+
+For more advanced setups take a look at [examples/docker/advanced-docker-compose.yml](examples/docker/advanced-docker-compose.yml).
+It uses an external mariadb instance and allows configuation through the `uffd.cfg`.
+Additionally a custom name and email address is provided for the initial admin user.
+
+The uwsgi server also exposes stats on port 9191, which can be used for monitoring.
+
 ## Migration from version 1
 
 Prior to version 2 uffd stored users, groups and mail aliases in an LDAP server.

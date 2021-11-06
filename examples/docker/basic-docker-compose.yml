@@ -1,0 +1,29 @@
+version: "3"
+
+networks:
+  uffd: {}
+
+volumes:
+  static-files: {}
+  data: {}
+
+services:
+  uffd-python:
+    image: registry.git.cccv.de/uffd/uffd
+    environment:
+      UFFD_SECRET_KEY: supersecret
+      UFFD_INITIAL_ADMIN_PW: S3cr3tS3cr3t!
+    volumes:
+      - static-files:/var/www/uffd
+      - data:/var/lib/uffd
+    networks:
+      - uffd
+  nginx:
+    image: nginx
+    volumes:
+      - static-files:/var/www/uffd
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    networks:
+      - uffd
