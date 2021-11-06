@@ -213,7 +213,7 @@ test:package:apt:bullseye:
 .publish:
   stage: deploy
   rules:
-    - if: '$CI_COMMIT_TAG =~ /v[0-9]+[.][0-9]+[.][0-9]+.*/'
+    - if: '$CI_COMMIT_TAG =~ /v[0-9]+[.][0-9]+[.][0-9]+.*/ && $REPUBLISH_DOCKER != "true"'
 
 publish:pip:
   extends: .publish
@@ -239,6 +239,8 @@ publish:apt:
 
 publish:docker:
   extends: .publish
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /v[0-9]+[.][0-9]+[.][0-9]+.*/'
   image:
     name: gcr.io/go-containerregistry/crane:debug
     entrypoint: [""]
