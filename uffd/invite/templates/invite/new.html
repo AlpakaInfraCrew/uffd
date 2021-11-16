@@ -13,7 +13,7 @@
 		<label for="valid-until">{{_('Valid Until')}}</label>
 		<input class="form-control" type="datetime-local" id="valid-until" name="valid-until"
 				value="{{ (datetime.now() + timedelta(hours=36)).replace(hour=23, minute=59, second=59, microsecond=0).isoformat(timespec='minutes') }}"
-				min="{{ (datetime.now() + timedelta(minutes=10)).isoformat(timespec='minutes') }}"
+				min="{{ datetime.now().isoformat(timespec='minutes') }}"
 				max="{{ (datetime.now() + timedelta(days=config['INVITE_MAX_VALID_DAYS'])).isoformat(timespec='minutes') }}"
 		>
 		<small class="text-muted">{{_('Must be within the next %(max_valid_days)d days', max_valid_days=config['INVITE_MAX_VALID_DAYS'])}}</small>
