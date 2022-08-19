@@ -69,6 +69,14 @@ linter:buster:
     reports:
       codequality: codeclimate.json
 
+linter_typehints:buster:
+  image: registry.git.cccv.de/uffd/docker-images/buster
+  stage: test
+  script:
+  - pip3 install --upgrade pip
+  - pip3 install pytype
+  - pytype --config pytype.cfg
+
 linter:bullseye:
   image: registry.git.cccv.de/uffd/docker-images/bullseye
   stage: test

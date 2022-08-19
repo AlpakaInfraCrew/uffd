@@ -2,6 +2,7 @@
 
 # Testing
 pytest==3.10.1
+pytype==2022.8.17
 atomicwrites==1.1.5
 attrs==18.2.0
 more-itertools==4.2.0
