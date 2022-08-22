@@ -2,7 +2,7 @@ import enum
 
 from flask import current_app
 from flask_babel import get_locale
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Enum
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Enum, DateTime
 from sqlalchemy.orm import relationship, validates
 
 from uffd.database import db
@@ -54,6 +54,11 @@ class ServiceUser(db.Model):
 	service = relationship('Service', viewonly=True)
 	user_id = Column(Integer(), ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
 	user = relationship('User', viewonly=True)
+
+	needs_sync = Column(Boolean())
+	last_sync = Column(DateTime())
+	sync_token = Column(String(32))
+	sync_started = Column(DateTime())
 
 	@property
 	def has_access(self):
@@ -167,6 +172,27 @@ class ServiceUser(db.Model):
 			else_=(AliasedPrimaryEmail.address == email)
 		)
 		return query.filter(db.and_(db.not_(remailer_enabled), real_email_matches))
+
+@db.event.listens_for(db.Session, 'after_flush') # pylint: disable=no-member
+def mark_service_users_changed(session, flush_context): # pylint: disable=unused-argument
+	user_ids = set()
+	service_ids = set()
+	for obj in session.dirty:
+		if isinstance(obj, User):
+			user_ids.add(obj.id)
+		# We modify ServiceUser during the sync API call, so if we want to react
+		# to ServiceUser changes, we must be more selective
+		#elif isinstance(obj, ServiceUser):
+		#	user_ids.add(obj.user_id)
+		elif isinstance(obj, Service):
+			service_ids.add(obj.id)
+	ServiceUser.query.filter(db.or_(
+		ServiceUser.service_id.in_(service_ids),
+		ServiceUser.user_id.in_(user_ids),
+	)).update(dict(
+		needs_sync=True,
+		sync_token=None,
+	), synchronize_session=False)
 
 @db.event.listens_for(db.Session, 'after_flush') # pylint: disable=no-member
 def create_service_users(session, flush_context): # pylint: disable=unused-argument

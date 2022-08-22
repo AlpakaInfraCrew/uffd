@@ -1,4 +1,6 @@
 import functools
+import datetime
+from secrets import token_hex
 
 from flask import Blueprint, jsonify, request, abort, Response
 
@@ -222,3 +224,50 @@ def prometheus_metrics():
 	registry.register(PLATFORM_COLLECTOR)
 	registry.register(UffdCollector())
 	return Response(response=generate_latest(registry=registry),content_type=CONTENT_TYPE_LATEST)
+
+@bp.route('/sync', methods=['GET'])
+@apikey_required('users')
+def start_sync():
+	sync_token = token_hex(16)
+	service_users = ServiceUser.query.filter(
+		ServiceUser.service == request.api_client.service,
+		db.or_(
+			ServiceUser.needs_sync == True,
+			ServiceUser.needs_sync == None,
+			ServiceUser.last_sync < datetime.datetime.utcnow() - datetime.timedelta(hours=24),
+		),
+		db.or_(
+			ServiceUser.sync_token == None,
+			ServiceUser.sync_started < datetime.datetime.utcnow() - datetime.timedelta(seconds=10),
+		)
+	).order_by(ServiceUser.needs_sync, ServiceUser.last_sync.desc()).limit(10).with_for_update().all()
+	for service_user in service_users:
+		service_user.sync_started = datetime.datetime.utcnow()
+		service_user.sync_token = sync_token
+	db.session.commit()
+	return jsonify([
+		{
+			'sync_token': f'{sync_token}-{service_user.user_id}',
+			'data': generate_user_dict(service_user),
+		}
+		for service_user in service_users
+	])
+
+@bp.route('/sync', methods=['POST'])
+@apikey_required('users')
+def finish_sync():
+	for result in request.json:
+		sync_token, user_id = result['sync_token'].split('-', 1)
+		query = ServiceUser.query.filter_by(
+			service=request.api_client.service,
+			user_id=user_id,
+			sync_token=sync_token,
+		)
+		if result['status'] == 'ok':
+			query.update(dict(
+				sync_token=None,
+				last_sync=datetime.datetime.utcnow(),
+				needs_sync=False,
+			))
+	db.session.commit()
+	return 'OK', 200
