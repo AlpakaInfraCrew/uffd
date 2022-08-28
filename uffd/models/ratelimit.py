@@ -24,23 +24,36 @@ class RatelimitEvent(db.Model):
 		return self.expires < datetime.datetime.utcnow()
 
 class Ratelimit:
+	_redis = False
+
 	def __init__(self, name, interval, limit):
 		self.name = name
 		self.interval = interval
 		self.limit = limit
 		self.base = interval**(1/limit)
 
-	def log(self, key=None):
-		db.session.add(RatelimitEvent(name=self.name, key=key, expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=self.interval)))
-		db.session.commit()
+	@classmethod
+	def init_app(cls, app):
+		if not app.config.get('REDIS_HOST'):
+			cls._redis = False
+		else:
+			import redis
+			cls._redis = redis.Redis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'], db=app.config['REDIS_DB'])
 
-	def get_delay(self, key=None):
-		events = RatelimitEvent.query\
-				.filter(db.not_(RatelimitEvent.expired))\
-				.filter_by(name=self.name, key=key)\
-				.order_by(RatelimitEvent.timestamp)\
-				.all()
-		if not events:
+
+	def __redis_get_index(self, key=None):
+		return 'ratelimit:{}{}'.format(self.name, (':' + key) or '')
+
+	def log(self, key=None):
+		if not self._redis:
+			db.session.add(RatelimitEvent(name=self.name, key=key, expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=self.interval)))
+			db.session.commit()
+		else:
+			self._redis.incr(self.__redis_get_index(key))
+			self._redis.expire(self.__redis_get_index(key), ttl=self.intervall, nx=True)
+
+	def get_delay_backoff(self, events):
+		if events < 1:
 			return 0
 		delay = math.ceil(self.base**len(events))
 		if delay < 5:
@@ -48,6 +61,18 @@ class Ratelimit:
 		delay = min(delay, 365*24*60*60) # prevent overflow of datetime objects
 		remaining = events[0].timestamp + datetime.timedelta(seconds=delay) - datetime.datetime.utcnow()
 		return max(0, math.ceil(remaining.total_seconds()))
+
+	def get_delay(self, key=None):
+		if not self._redis:
+			events = RatelimitEvent.query\
+				.filter(db.not_(RatelimitEvent.expired))\
+				.filter_by(name=self.name, key=key)\
+				.order_by(RatelimitEvent.timestamp)\
+				.all()
+		else:
+			events = self._redis.get(self.__redis_get_index(key)) or 0
+
+		return self.get_delay_backoff(len(events))
 
 def get_addrkey(addr=None):
 	if addr is None:

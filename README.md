@@ -15,6 +15,7 @@ Please note that we refer to Debian packages here and **not** pip packages.
 - python3-qrcode
 - python3-fido2 (version 0.5.0 or 0.9.1, optional)
 - python3-prometheus-client (optional, needed for metrics)
+- python3-redis (optional, needed for redis support)
 - python3-oauthlib
 - python3-flask-babel
 - python3-argon2

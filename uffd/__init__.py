@@ -68,6 +68,7 @@ def create_app(test_config=None): # pylint: disable=too-many-locals,too-many-sta
 
 	app.register_blueprint(csrf_bp)
 
+	models.init_app(app)
 	views.init_app(app)
 	commands.init_app(app)
 

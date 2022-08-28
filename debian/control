@@ -33,4 +33,5 @@ Recommends:
  nginx,
  python3-mysqldb,
  python3-prometheus-client,
+ python3-redis,
 Description: Web-based user management and single sign-on software

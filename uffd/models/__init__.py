@@ -26,3 +26,6 @@ __all__ = [
 	'User', 'UserEmail', 'Group',
 	'RatelimitEvent', 'Ratelimit', 'HostRatelimit', 'host_ratelimit', 'format_delay',
 ]
+
+def init_app(app):
+	Ratelimit.init_app(app)

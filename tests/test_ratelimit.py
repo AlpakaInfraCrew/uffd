@@ -6,7 +6,10 @@ from uffd.models.ratelimit import get_addrkey, format_delay, Ratelimit, Ratelimi
 
 from utils import UffdTestCase
 
-class TestRatelimit(UffdTestCase):
+class TestRatelimitDB(UffdTestCase):
+	def setUpConfig(self, config):
+		config['REDIS_HOST'] = False
+
 	def test_limiting(self):
 		cases = [
 			(1*60, 3),
@@ -48,3 +51,18 @@ class TestRatelimit(UffdTestCase):
 		self.assertIsInstance(format_delay(120), str)
 		self.assertIsInstance(format_delay(3600), str)
 		self.assertIsInstance(format_delay(4000), str)
+
+class TestRatelimitRedis(TestRatelimitDB):
+	def setUpConfig(self, config):
+		import redis
+		config['REDIS_HOST'] = 'localhost'
+		config['REDIS_PORT'] = 6379
+		config['REDIS_DB'] = 0
+		self.redis = redis.Redis(
+				host=config['REDIS_HOST'],
+				port=config['REDIS_PORT'],
+				db=config['REDIS_DB'])
+		return config
+
+	def setUpDB(self):
+		self.redis.flushdb();

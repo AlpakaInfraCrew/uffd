@@ -68,7 +68,7 @@ class UffdTestCase(unittest.TestCase):
 			'MAIL_SKIP_SEND': True,
 			'SELF_SIGNUP': True,
 		}
-
+		config = self.setUpConfig(config)
 		self.app = create_app(config)
 		self.setUpApp()
 		self.client = self.app.test_client()
@@ -91,6 +91,9 @@ class UffdTestCase(unittest.TestCase):
 		db.session.add(testmail)
 		self.setUpDB()
 		db.session.commit()
+
+	def setUpConfig(self, config):
+		return config
 
 	def setUpApp(self):
 		pass
