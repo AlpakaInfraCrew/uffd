@@ -12,7 +12,7 @@
 <div class="text-monospace">
 	<ul>
 	{% for method in methods %}
-		<li>{{ method.code }}</li>
+		<li>{{ method.code_value }}</li>
 	{% endfor %}
 	</ul>
 </div>
@@ -24,7 +24,7 @@
 
 <div class="btn-toolbar">
 	<a class="ml-auto mb-2 btn btn-primary d-print-none" href="{{ url_for('selfservice.setup_mfa') }}">{{_("Continue")}}</a>
-	<a class="ml-2 mb-2 btn btn-light d-print-none" href="{{ methods|map(attribute='code')|join('\n')|datauri }}" download="uffd-recovery-codes">
+	<a class="ml-2 mb-2 btn btn-light d-print-none" href="{{ methods|map(attribute='code_value')|join('\n')|datauri }}" download="uffd-recovery-codes">
 		{{_("Download codes")}}
 	</a>
 	<button class="ml-2 mb-2 btn btn-light d-print-none" type="button" onClick="window.print()">{{_("Print codes")}}</button>

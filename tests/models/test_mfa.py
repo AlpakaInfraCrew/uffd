@@ -40,10 +40,10 @@ class TestMfaMethodModels(UffdTestCase):
 		db.session.add(method)
 		db.session.commit()
 		method_id = method.id
-		method_code = method.code
+		method_code = method.code_value
 		db.session.expunge(method)
 		method = RecoveryCodeMethod.query.get(method_id)
-		self.assertFalse(hasattr(method, 'code'))
+		self.assertFalse(hasattr(method, 'code_value'))
 		self.assertFalse(method.verify(''))
 		self.assertFalse(method.verify('A'*8))
 		self.assertTrue(method.verify(method_code))
