@@ -493,6 +493,10 @@ class TestOIDCBasicProfile(UffdTestCase):
 	def validate_token_response(self, r, nonce='testnonce', client_id='test'):
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(r.content_type, 'application/json')
+		# OIDC Core 1.0 section 3.1.3.3:
+		# > All Token Responses that contain tokens, secrets, or other sensitive
+		# > information MUST include the following HTTP response header fields and values:
+		# >   Cache-Control: no-store
 		self.assertIn('Cache-Control', r.headers)
 		self.assertEqual(r.headers['Cache-Control'].lower(), 'no-store')
 		for key in r.json:
@@ -514,10 +518,6 @@ class TestOIDCBasicProfile(UffdTestCase):
 			# scope       = scope-token *( SP scope-token )
 			# scope-token = 1*( %x21 / %x23-5B / %x5D-7E )
 			self.assertRegex(r.json['scope'], r'^[!#-\[\]-~]+( [!#-\[\]-~]+)*$')
-		# OIDC Core 1.0 section 3.1.3.3:
-		# > All Token Responses that contain tokens, secrets, or other sensitive
-		# > information MUST include the following HTTP response header fields and values:
-		# >   Cache-Control: no-store
 		self.assertIn('id_token', r.json)
 		return self.validate_id_token(r.json['id_token'], nonce=nonce, client_id=client_id)
 
@@ -566,6 +566,8 @@ class TestOIDCBasicProfile(UffdTestCase):
 		r = self.do_auth_request(response_type='code')
 		args = self.validate_auth_response(r)
 		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
+		print(r, repr(r.response), repr(r.json))
+		self.assertTrue(False)
 		id_token = self.validate_token_response(r)
 		self.assertEqual(id_token['sub'], '10000')
 		r = self.do_userinfo_request(r.json['access_token'])
