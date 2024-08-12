@@ -70,14 +70,15 @@ class TestOAuth2Key(UffdTestCase):
 		})
 
 	def test_encode_jwt(self):
-		jwtdata = self.key.encode_jwt({'aud': 'test', 'foo': 'bar'})
+		jwt_data = self.key.encode_jwt({'aud': 'test', 'foo': 'bar'})
+		self.assertIsInstance(jwt_data, str)
 		self.assertEqual(
-			jwt.get_unverified_header(jwtdata),
+			jwt.get_unverified_header(jwt_data),
 			# typ is optional, x5u/x5c/jku/jwk are discoraged by OIDC Core 1.0 spec section 2
 			{'kid': self.key.id, 'alg': self.key.algorithm, 'typ': 'JWT'}
 		)
 		self.assertEqual(
-      OAuth2Key.decode_jwt(jwtdata, audience='test'),
+			OAuth2Key.decode_jwt(jwt_data, audience='test'),
 			{'aud': 'test', 'foo': 'bar'}
 		)
 		self.key.active = False
