@@ -566,7 +566,7 @@ class TestOIDCBasicProfile(UffdTestCase):
 		r = self.do_auth_request(response_type='code')
 		args = self.validate_auth_response(r)
 		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
-		print(r, repr(r.response), repr(r.json))
+		print(r, repr(r.data), repr(r.json))
 		self.assertTrue(False)
 		id_token = self.validate_token_response(r)
 		self.assertEqual(id_token['sub'], '10000')

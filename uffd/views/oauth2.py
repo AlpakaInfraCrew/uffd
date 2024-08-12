@@ -434,10 +434,11 @@ def token():
 	else:
 		# We don't support the refresh_token grant type. Due to limitations of
 		# oauthlib we always returned (disfunctional) refresh tokens in the past.
-		# We still do that for non-OIDC clients to not change behavour for
+		# We still do that for non-OIDC clients to not change behaviour for
 		# existing clients.
 		resp['refresh_token'] = tok.refresh_token
 
+	print('token_pre_jsonify', repr(resp))
 	return jsonify(resp), 200, {'Cache-Control': ['no-store']}
 
 def validate_access_token():
