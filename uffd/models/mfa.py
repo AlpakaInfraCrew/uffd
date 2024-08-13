@@ -8,13 +8,12 @@ import hmac
 import hashlib
 import base64
 import urllib.parse
-# imports for recovery codes
-import crypt # pylint: disable=deprecated-module
 from flask import request, current_app
 from sqlalchemy import Column, Integer, Enum, String, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
 from uffd.utils import nopad_b32decode, nopad_b32encode
+from uffd.password_hash import PasswordHashAttribute, CryptPasswordHash
 from uffd.database import db
 from .user import User
 
@@ -47,8 +46,8 @@ class MFAMethod(db.Model):
 		self.created = datetime.datetime.utcnow()
 
 class RecoveryCodeMethod(MFAMethod):
-	code_salt = Column('recovery_salt', String(64))
-	code_hash = Column('recovery_hash', String(256))
+	_code = Column('recovery_hash', String(256))
+	code = PasswordHashAttribute('_code', CryptPasswordHash)
 
 	__mapper_args__ = {
 		'polymorphic_identity': MFAType.RECOVERY_CODE
@@ -56,14 +55,11 @@ class RecoveryCodeMethod(MFAMethod):
 
 	def __init__(self, user):
 		super().__init__(user, None)
-		# The code attribute is only available in newly created objects as only
-		# it's hash is stored in the database
-		self.code = secrets.token_hex(8).replace(' ', '').lower()
-		self.code_hash = crypt.crypt(self.code)
+		# self.code_value is not stored and only available on freshly initiated objects
+		self.code = self.code_value = secrets.token_hex(8).replace(' ', '').lower()
 
 	def verify(self, code):
-		code = code.replace(' ', '').lower()
-		return secrets.compare_digest(crypt.crypt(code, self.code_hash), self.code_hash)
+		return self.code.verify(code.replace(' ', '').lower())
 
 def _hotp(counter, key, digits=6):
 	'''Generates HMAC-based one-time password according to RFC4226

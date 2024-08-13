@@ -244,7 +244,7 @@ class TestMfaViews(UffdTestCase):
 		dump('mfa_auth_recovery_code', r)
 		self.assertEqual(r.status_code, 200)
 		self.assertIsNone(request.user)
-		r = self.client.post(path=url_for('session.mfa_auth_finish', ref='/redirecttarget'), data={'code': method.code})
+		r = self.client.post(path=url_for('session.mfa_auth_finish', ref='/redirecttarget'), data={'code': method.code_value})
 		self.assertEqual(r.status_code, 302)
 		self.assertTrue(r.location.endswith('/redirecttarget'))
 		self.assertIsNotNone(request.user)
