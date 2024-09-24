@@ -428,6 +428,10 @@ def token():
 		id_token['iat'] = int(time.time())
 		id_token['at_hash'] = key.oidc_hash(tok.access_token.encode('ascii'))
 		id_token['exp'] = id_token['iat'] + tok.EXPIRES_IN
+
+		service_user = tok.service_user
+		id_token.update(render_claims(tok.scopes, (tok.claims or {}).get('userinfo', {}), service_user))
+
 		if grant.nonce:
 			id_token['nonce'] = grant.nonce
 		resp['id_token'] = OAuth2Key.get_preferred_key().encode_jwt(id_token)
