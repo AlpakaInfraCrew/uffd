@@ -1,6 +1,11 @@
-Hi {{ user.displayname }},
+Moin {{ user.displayname }},
 
-you have requested to change your mail address. To confirm the change, please visit the following url:
+Du möchtest deine E-Mail Adresse ändern. Um diese zu bestätigen klicke auf diesen Link:
 {{ url_for('selfservice.verify_email', email_id=email.id, secret=secret, _external=True) }}
 
-**The link is valid for 48h**
+**Der Link ist maximal 48 Stunden gültig**
+
+
+Viele Grüße
+
+die Alpaka Infra Crew
