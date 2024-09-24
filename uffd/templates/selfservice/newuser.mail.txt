@@ -1,12 +1,12 @@
-Hi {{ user.displayname }},
+Moin {{ user.displayname }},
 
-welcome to the {{ config.ORGANISATION_NAME }} infrastructure! An account was created for you.
+Willkommen im Single Sign On von Jugend hackt!
 
-Please visit the following url to set your password:
+Klick hier um dein Passwort zu setzen:
 
 {{ url_for('selfservice.token_password', token_id=token.id, token=token.token, _external=True) }}
 
-**The link is valid for 48h**
+**Der Link ist maximal 48 Stunden gültig**
 
 {% if config.WELCOME_TEXT %}
 {{ config.WELCOME_TEXT }}

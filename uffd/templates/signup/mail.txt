@@ -1,16 +1,16 @@
-Hi {{ signup.displayname }},
+Moin {{ signup.displayname }},
 
-an account was created on the {{ config.ORGANISATION_NAME }} infrastructure with this mail address.
-
-Please visit the following url to complete the account registration:
+dein Account im Single Sign On von Jugend hackt wurde erstellt. Um ihn aktivieren & nutzen zu können klicke auf den folgenden Link:
 
 {{ url_for('signup.signup_confirm', signup_id=signup.id, token=signup.token, _external=True) }}
 
-**The link is valid for 48h**
+Solltest du nicht innerhalb von 48 Stunden auf den Link klicken wird der Account wieder automatisch gelöscht.
 
-{% if config.WELCOME_TEXT %}
-{{ config.WELCOME_TEXT }}
+**Der Link ist maximal 48 Stunden gültig**
 
-{% endif -%}
+Anleitungen & weitere Hinweise findest du unter https://docs.alpaka.space
 
-If you have not requested an account on the {{ config.ORGANISATION_NAME }} infrastructure, you can ignore this mail.
+
+Viele Grüße & viel Spaß!
+
+die Alpaka Infra Crew
