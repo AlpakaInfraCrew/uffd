@@ -234,25 +234,13 @@ msgstr "Löschen"
 msgid "Group ID"
 msgstr "Gruppen ID"
 
-#: uffd/templates/group/show.html:20
-msgid "automatically chosen if empty"
-msgstr "wird automatisch bestimmt falls leer"
-
-#: uffd/templates/group/show.html:26 uffd/templates/user/show.html:75
-msgid "UUID"
-msgstr "UUID"
-
-#: uffd/templates/group/show.html:27 uffd/templates/user/show.html:63
-#: uffd/templates/user/show.html:77
-msgid "automatically chosen"
-msgstr "wird automatisch bestimmt"
-
-#: uffd/templates/group/show.html:33 uffd/templates/signup/start.html:18
+#: uffd/templates/group/show.html:29 uffd/templates/signup/start.html:18
+#, fuzzy
 msgid ""
-"At least one and at most 32 lower-case characters, digits, dashes (\"-\")"
+"At least two and at most 32 lower-case characters, digits, dashes (\"-\")"
 " or underscores (\"_\"). <b>Cannot be changed later!</b>"
 msgstr ""
-"1 bis 32 Kleinbuchstaben, Zahlen, Binde- (\"-\") und Unterstriche "
+"2 bis 32 Kleinbuchstaben, Zahlen, Binde- (\"-\") und Unterstriche "
 "(\"_\"). <b>Kann später nicht geändert werden!</b>"
 
 #: uffd/templates/group/show.html:44 uffd/templates/role/show.html:71
