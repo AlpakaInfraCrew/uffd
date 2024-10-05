@@ -208,7 +208,7 @@ class User(db.Model):
 		return False
 
 	def set_loginname(self, value, ignore_blocklist=False):
-		if len(value) > 32 or len(value) < 1:
+		if len(value) > 32 or len(value) < 2:
 			return False
 		for char in value:
 			if not char in string.ascii_lowercase + string.digits + '_-':
