@@ -3,7 +3,7 @@ import base64
 from datetime import timedelta, datetime
 import io
 
-from flask import Markup
+from markupsafe import Markup
 
 import qrcode
 import qrcode.image.svg

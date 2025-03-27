@@ -1,3 +1,4 @@
+import json
 import os
 import secrets
 import sys
@@ -21,12 +22,10 @@ def load_config_file(app, path, silent=False):
 		return False
 
 	if path.endswith(".json"):
-		app.config.from_json(path)
+		app.config.from_file(path, load=json.load)
 	elif path.endswith(".yaml") or path.endswith(".yml"):
 		import yaml  # pylint: disable=import-outside-toplevel disable=import-error
-		with open(path, encoding='utf-8') as ymlfile:
-			data = yaml.safe_load(ymlfile)
-		app.config.from_mapping(data)
+		app.config.from_file(path, load=yaml.safe_load)
 	else:
 		app.config.from_pyfile(path, silent=True)
 	return True
@@ -47,7 +46,7 @@ def init_config(app: Flask, test_config):
 				break
 
 	if app.secret_key is None:
-		if app.env == "production":
+		if not app.debug:
 			raise Exception("SECRET_KEY not configured and we are running in production mode!")
 		app.secret_key = secrets.token_hex(128)
 

@@ -16,4 +16,4 @@ def profile_command(): #pylint: disable=unused-variable
 	# variable.
 	os.environ['FLASK_RUN_FROM_CLI'] = 'false'
 	current_app.wsgi_app = ProfilerMiddleware(current_app.wsgi_app, restrictions=[30])
-	current_app.run(debug=True)
+	current_app.run(debug=True, threaded=False)

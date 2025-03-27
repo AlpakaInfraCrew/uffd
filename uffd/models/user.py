@@ -3,8 +3,9 @@ import re
 import datetime
 import unicodedata
 
-from flask import current_app, escape
+from flask import current_app
 from flask_babel import lazy_gettext
+from markupsafe import escape
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, DateTime
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.ext.hybrid import hybrid_property

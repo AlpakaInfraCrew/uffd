@@ -35,7 +35,7 @@ Then use `flask run` to start the application:
 
 ```
 FLASK_APP=uffd flask db upgrade
-FLASK_APP=uffd FLASK_ENV=development flask run
+FLASK_APP=uffd flask --debug run
 ```
 
 During development, you may want to create some example data:

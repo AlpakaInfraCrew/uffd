@@ -44,8 +44,8 @@ db_migrations_updated:
   stage: test
   needs: []
   script:
-  - FLASK_APP=uffd FLASK_ENV=testing flask db upgrade
-  - FLASK_APP=uffd FLASK_ENV=testing flask db migrate 2>&1 | grep -q 'No changes in schema detected'
+  - FLASK_APP=uffd flask --debug db upgrade
+  - FLASK_APP=uffd flask --debug db migrate 2>&1 | grep -q 'No changes in schema detected'
 
 linter:bookworm:
   image: registry.git.cccv.de/uffd/docker-images/bookworm
