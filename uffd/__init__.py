@@ -95,21 +95,28 @@ def create_app(test_config=None): # pylint: disable=too-many-locals,too-many-sta
 	if not hasattr(LOCALTZ, 'localize'):
 		LOCALTZ.localize = lambda dt: dt.replace(tzinfo=LOCALTZ)
 
+	app.config.setdefault('BABEL_DEFAULT_TIMEZONE', 'LOCALTZ')
 	class PatchedBabel(Babel):
 		@property
 		def default_timezone(self):
-			if self.app.config['BABEL_DEFAULT_TIMEZONE'] == 'LOCALTZ':
+			# Since flask-babel v3 get_babel().default_timezone would be more concise, but
+			# Debian Bookworm ships flask-babel v2 and there is no functional difference
+			if app.config['BABEL_DEFAULT_TIMEZONE'] == 'LOCALTZ':
 				return LOCALTZ
 			return super().default_timezone
 
-	babel = PatchedBabel(app, default_timezone='LOCALTZ')
-
-	@babel.localeselector
 	def get_locale(): #pylint: disable=unused-variable
 		language_cookie = request.cookies.get('language')
 		if language_cookie is not None and language_cookie in app.config['LANGUAGES']:
 			return language_cookie
 		return request.accept_languages.best_match(list(app.config['LANGUAGES']))
+
+	if hasattr(PatchedBabel, 'localeselector'):
+		# Support flask-babel v2 (Debian Bookworm)
+		babel = PatchedBabel(app)
+		babel.localeselector(get_locale)
+	else:
+		babel = PatchedBabel(app, locale_selector=get_locale) # pylint: disable=unexpected-keyword-arg
 
 	app.add_template_global(get_locale)
 
