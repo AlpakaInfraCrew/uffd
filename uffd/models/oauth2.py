@@ -84,15 +84,16 @@ class OAuth2Grant(db.Model):
 	nonce = Column(Text(), nullable=True)
 	scopes = Column('_scopes', CommaSeparatedList(), nullable=False, default=tuple())
 
-	_claims = Column('claims', Text(), nullable=True)
+	_claims = Column('claims', Text(), nullable=False, default='{}')
 
 	@property
 	def claims(self):
-		return json.loads(self._claims) if self._claims is not None else None
+		return json.loads(self._claims)
 
 	@claims.setter
 	def claims(self, value):
-		self._claims = json.dumps(value) if value is not None else None
+		assert isinstance(value, dict)
+		self._claims = json.dumps(value)
 
 	@property
 	def service_user(self):
@@ -151,15 +152,16 @@ class OAuth2Token(db.Model):
 	refresh_token = property(lambda self: f'{self.id}-{self._refresh_token}')
 	scopes = Column('_scopes', CommaSeparatedList(), nullable=False, default=tuple())
 
-	_claims = Column('claims', Text(), nullable=True)
+	_claims = Column('claims', Text(), nullable=False, default='{}')
 
 	@property
 	def claims(self):
-		return json.loads(self._claims) if self._claims is not None else None
+		return json.loads(self._claims)
 
 	@claims.setter
 	def claims(self, value):
-		self._claims = json.dumps(value) if value is not None else None
+		assert isinstance(value, dict)
+		self._claims = json.dumps(value)
 
 	@property
 	def service_user(self):

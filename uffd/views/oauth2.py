@@ -214,7 +214,7 @@ def authorize_validate_request():
 
 def authorize_validate_request_oidc(grant):
 	nonce = request.args.get('nonce')
-	claims = json.loads(request.args['claims']) if 'claims' in request.args else None
+	claims = json.loads(request.args.get('claims', '{}'))
 
 	if 'request' in request.args:
 		raise RequestNotSupportedError()
@@ -226,7 +226,7 @@ def authorize_validate_request_oidc(grant):
 		raise InvalidRequestError(error_description='Invalid usage of none prompt parameter value')
 
 	sub_value = None
-	if claims and claims.get('id_token', {}).get('sub', {}).get('value') is not None:
+	if claims.get('id_token', {}).get('sub', {}).get('value') is not None:
 		sub_value = claims['id_token']['sub']['value']
 	if 'id_token_hint' in request.args:
 		try:
@@ -422,7 +422,7 @@ def token():
 	}
 	if 'openid' in tok.scopes:
 		key = OAuth2Key.get_preferred_key()
-		id_token = render_claims(['openid'], (grant.claims or {}).get('id_token', {}), tok.service_user)
+		id_token = render_claims(['openid'], grant.claims.get('id_token', {}), tok.service_user)
 		id_token['iss'] = get_issuer()
 		id_token['aud'] = tok.client.client_id
 		id_token['iat'] = int(time.time())
@@ -472,7 +472,7 @@ def userinfo():
 
 	service_user = tok.service_user
 	if 'openid' in tok.scopes:
-		resp = render_claims(tok.scopes, (tok.claims or {}).get('userinfo', {}), service_user)
+		resp = render_claims(tok.scopes, tok.claims.get('userinfo', {}), service_user)
 	else:
 		resp = {
 			'id': service_user.user.unix_uid,
