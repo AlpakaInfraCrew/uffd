@@ -198,7 +198,7 @@ def delete(id):
 def csvimport():
 	csvdata = request.values.get('csv')
 	if not csvdata:
-		flash('No data for csv import!')
+		flash('No data for CSV import!')
 		return redirect(url_for('user.index'))
 
 	ignore_blocklist = request.values.get('ignore-loginname-blocklist', False)

@@ -26,7 +26,7 @@ role_inclusion = db.Table('role-inclusion',
 )
 
 def flatten_recursive(objs, attr):
-	'''Returns a set of objects and all objects included in object.`attr` recursivly while avoiding loops'''
+	'''Returns a set of objects and all objects included in object.`attr` recursively while avoiding loops'''
 	objs = set(objs)
 	new_objs = set(objs)
 	while new_objs:

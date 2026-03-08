@@ -25,7 +25,7 @@ class Service(db.Model):
 	# were migrated from config definitions where a missing "required_group"
 	# parameter meant no access restrictions. Representing this state by
 	# setting access_group_id to NULL would lead to a bad/unintuitive ondelete
-	# behaviour.
+	# behavior.
 	limit_access = Column(Boolean(create_constraint=True), default=True, nullable=False)
 	access_group_id = Column(Integer(), ForeignKey('group.id', onupdate='CASCADE', ondelete='SET NULL'), nullable=True)
 	access_group = relationship('Group')

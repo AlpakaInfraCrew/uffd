@@ -89,7 +89,7 @@ def create(loginname, mail, displayname, service, password, prompt_password, add
 @click.option('--mail', metavar='EMAIL_ADDRESS', help='Set e-mail address.')
 @click.option('--displayname', help='Set display name.')
 @click.option('--password', help='Set password for SSO login.')
-@click.option('--prompt-password', is_flag=True, flag_value=True, default=False, help='Set password by reading it interactivly from terminal.')
+@click.option('--prompt-password', is_flag=True, flag_value=True, default=False, help='Set password by reading it interactively from terminal.')
 @click.option('--clear-roles', is_flag=True, flag_value=True, default=False, help='Remove all roles from user. Executed before --add-role.')
 @click.option('--add-role', multiple=True, help='Add role to user. Repeat to add multiple roles.')
 @click.option('--remove-role', multiple=True, help='Remove role from user. Repeat to remove multiple roles.')

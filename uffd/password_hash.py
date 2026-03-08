@@ -217,7 +217,7 @@ class InvalidPasswordHash:
 	def __bool__(self):
 		return False
 
-# An alternative approach for the behaviour of PasswordHashAttribute would be
+# An alternative approach for the behavior of PasswordHashAttribute would be
 # to use sqlalchemy.TypeDecorator. A type decorator allows custom encoding and
 # decoding of values coming from the database (when query results are loaded)
 # and going into the database (when statements are executed).
@@ -290,6 +290,6 @@ LowEntropyPasswordHash = Argon2PasswordHash
 
 # Hashing method for high entropy secrets like API keys. The secrets are
 # generated instead of user-selected to ensure a high level of entropy. Is
-# fast and does not need salting, since dictionary attacks are not feasable
+# fast and does not need salting, since dictionary attacks are not feasible
 # due to high entropy.
 HighEntropyPasswordHash = SHA512PasswordHash

@@ -53,7 +53,7 @@ class TestRemailer(UffdTestCase):
 		self.assertNotEqual(remailer.build_v2_address(SERVICE1_ID, USER_ID), ADDR_V2_S1)
 
 	def test_parse_address(self):
-		# REMAILER_DOMAIN behaviour
+		# REMAILER_DOMAIN behavior
 		self.app.config['REMAILER_DOMAIN'] = None
 		self.assertIsNone(remailer.parse_address(ADDR_V1_S2))
 		self.assertIsNone(remailer.parse_address(ADDR_V2_S2))
@@ -72,7 +72,7 @@ class TestRemailer(UffdTestCase):
 		self.app.config['REMAILER_OLD_DOMAINS'] = ['remailer.example.com']
 		self.assertEqual(remailer.parse_address(ADDR_V1_S2), (SERVICE2_ID, USER_ID))
 		self.assertEqual(remailer.parse_address(ADDR_V2_S2), (SERVICE2_ID, USER_ID))
-		# REMAILER_SECRET_KEY behaviour
+		# REMAILER_SECRET_KEY behavior
 		self.app.config['REMAILER_DOMAIN'] = 'remailer.example.com'
 		self.app.config['REMAILER_OLD_DOMAINS'] = []
 		self.assertEqual(remailer.parse_address(ADDR_V1_S2), (SERVICE2_ID, USER_ID))

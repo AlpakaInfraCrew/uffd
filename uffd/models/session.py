@@ -98,7 +98,7 @@ class Session(db.Model):
 #   mobile phone without trusting the device enough to expose his full
 #   credentials.
 # * A user wants to log into an OAuth2-enabled web service on a secondary
-#   device at a busy event location with too little privacy to securly enter
+#   device at a busy event location with too little privacy to securely enter
 #   his credentials but already has a login session on his laptop.
 # * A user wants to log into an OAuth2-enabled service via the web browser
 #   on a native mobile app on his phone and cannot use his 2FA method on that
@@ -107,9 +107,9 @@ class Session(db.Model):
 # The mechanism uses two random codes: When the user attempts to authenticate
 # with an SSO-enabled service and chooses the "Device Login" option on the SSO
 # login page, the SSO generates and displays an initiation code. That code is
-# securly bound to the browser session that is used to request it. The user
+# securely bound to the browser session that is used to request it. The user
 # logs into the SSO on another device using his credentials and 2FA methods and
-# opens a page to authorize the device login attempt. There he enteres the
+# opens a page to authorize the device login attempt. There he enters the
 # initiation code. The SSO displays the details of the device login attempt
 # (i.e. the name of the service to log into). Once the user authorizes the
 # login attempt, the SSO generates a confirmation code and displays it to the
@@ -143,12 +143,12 @@ class DeviceLoginInitiation(db.Model):
 	"Device Login" on the login page. Instances are always bound to a
 	specific service, e.g. a client id in case of OAuth2.
 
-	The code attribute is formed out of two indepentently unique parts
+	The code attribute is formed out of two independently unique parts
 	to ensure that at any time all existing codes differ in at least two
 	characters (i.e. mistyping one character can not result in another
 	existing and possibly attacker-controlled code).
 
-	An initiation code is securly bound to the session that it was created
+	An initiation code is securely bound to the session that it was created
 	with by storing both id and secret in the authenticated session cookie.'''
 	__tablename__ = 'device_login_initiation'
 
@@ -187,7 +187,7 @@ class DeviceLoginConfirmation(db.Model):
 	enters an initiation code and confirms the device login attempt. Every
 	instance is bound to both an initiation code and a login session.
 
-	The code attribute is formed out of two indepentently unique parts
+	The code attribute is formed out of two independently unique parts
 	to ensure that at any time all existing codes differ in at least two
 	characters (i.e. mistyping one character can not result in another
 	existing and possibly attacker-controlled code).'''

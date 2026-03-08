@@ -132,7 +132,7 @@ Remove the following config options:
 * `ENABLE_PASSWORDRESET`
 * `ENABLE_ROLESELFSERVICE`
 * `OAUTH2_CLIENTS`
-* `API_CLIENTS` (should not be set, see "Preperation")
+* `API_CLIENTS` (should not be set, see "Preparation")
 * `API_CLIENTS_2`
 * `LDAP_SERVICE_MOCK` (development option, should not be set)
 

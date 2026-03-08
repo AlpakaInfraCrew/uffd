@@ -152,7 +152,7 @@ uffd supports the optional `claims` authorization request parameter for requesti
 Note that there is a IANA-registered `groups` claim with a syntax borrowed from [SCIM](https://www.rfc-editor.org/rfc/rfc7643.html).
 The syntax used by uffd is different and incompatible, although arguably more common for a claim named "groups" in this context.
 
-uffd aims for complience with OpenID provider conformance profiles Basic and Config.
+uffd aims for compliance with OpenID provider conformance profiles Basic and Config.
 It is, however, not a certified OpenID provider and it has the following limitations:
 
 * Only the `none` value for the `prompt` authorization request parameter is recognized. Other values (`login`, `consent` and `select_account`) are ignored.
@@ -180,7 +180,7 @@ uffd_version_info{version="local"} 1.0
 
 ## Translation
 
-The web frontend is initially written in English and translated in the following Languages:
+The web front end is initially written in English and translated in the following Languages:
 
 ![status](https://git.cccv.de/uffd/uffd/badges/master/coverage.svg?job=trans_de&key_text=DE)
 

@@ -8,10 +8,10 @@ from uffd.database import db
 
 class Mail(db.Model):
 	# Aliases are looked up by receiver addresses with api.getmails. To emulate
-	# the pre-v2/LDAP behaviour, the lookup needs to be case-insensitive. To not
-	# rely on database-specific behaviour, we ensure that all receiver addresses
+	# the pre-v2/LDAP behavior, the lookup needs to be case-insensitive. To not
+	# rely on database-specific behavior, we ensure that all receiver addresses
 	# are stored lower-case and convert incoming addresses in api.getmails to
-	# lower-case. Note that full emulation of LDAP behaviour would also require
+	# lower-case. Note that full emulation of LDAP behavior would also require
 	# whitespace normalization. Instead we disallow spaces in receiver addresses.
 
 	# Match ASCII code points 33 (!) to 64 (@) and 91 ([) to 126 (~), i.e. any

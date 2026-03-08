@@ -316,7 +316,7 @@ def authorize():
 			grant, sub_value, prompt_values = authorize_validate_request_oidc(grant)
 	except OAuth2Error as err:
 		# Correct OAuth2/OIDC error handling would be to redirect back to the
-		# client with an error paramter, unless client_id or redirect_uri is
+		# client with an error parameter, unless client_id or redirect_uri is
 		# invalid. However, uffd never did that before adding OIDC support and
 		# many applications fail to correctly handle this case. As a compromise
 		# we report errors correctly in OIDC mode and don't in plain OAuth2 mode.
@@ -433,8 +433,8 @@ def token():
 		resp['id_token'] = OAuth2Key.get_preferred_key().encode_jwt(id_token)
 	else:
 		# We don't support the refresh_token grant type. Due to limitations of
-		# oauthlib we always returned (disfunctional) refresh tokens in the past.
-		# We still do that for non-OIDC clients to not change behavour for
+		# oauthlib we always returned (dysfunctional) refresh tokens in the past.
+		# We still do that for non-OIDC clients to not change behavior for
 		# existing clients.
 		resp['refresh_token'] = tok.refresh_token
 

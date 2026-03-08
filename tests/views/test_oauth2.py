@@ -766,7 +766,7 @@ class TestOIDCBasicProfile(UffdTestCase):
 		args = self.validate_auth_response(r)
 		r = self.do_token_request(grant_type='authorization_code')
 		self.assert_token_error(r, 'invalid_request')
-		# redirect_uri behaviour is already tested in test_redirect_uri
+		# redirect_uri behavior is already tested in test_redirect_uri
 		# Invalid grant type
 		r = self.do_auth_request(response_type='code')
 		args = self.validate_auth_response(r)

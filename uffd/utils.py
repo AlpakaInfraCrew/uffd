@@ -16,7 +16,7 @@ def token_typeable(nbytes=None):
 	return token_with_alphabet(alphabet, nbytes=nbytes)
 
 def token_urlfriendly(nbytes=None):
-	'''Return random text token that is urlsafe and works around common parsing bugs'''
+	'''Return random text token that is URL safe and works around common parsing bugs'''
 	alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 	return token_with_alphabet(alphabet, nbytes=nbytes)
 
