@@ -18,7 +18,7 @@ def signup_enabled(func):
 	@functools.wraps(func)
 	def decorator(*args, **kwargs):
 		if not current_app.config['SELF_SIGNUP']:
-			flash(_('Signup not enabled'))
+			flash(_('Sign-up not enabled'))
 			return redirect(url_for('index'))
 		return func(*args, **kwargs)
 	return decorator
@@ -49,7 +49,7 @@ def signup_submit():
 	signup_delay = signup_ratelimit.get_delay(request.form['mail'])
 	host_delay = host_ratelimit.get_delay()
 	if signup_delay and signup_delay > host_delay:
-		flash(_('Too many signup requests with this mail address! Please wait %(delay)s.',
+		flash(_('Too many sign-up requests with this mail address! Please wait %(delay)s.',
 		        delay=format_delay(signup_delay)), 'error')
 		return render_template('signup/start.html')
 	if host_delay:
@@ -81,7 +81,7 @@ def signup_submit():
 def signup_confirm(signup_id, token):
 	signup = Signup.query.get(signup_id)
 	if not signup or not secrets.compare_digest(signup.token, token) or signup.expired or signup.completed:
-		flash(_('Invalid signup link'))
+		flash(_('Invalid sign-up link'))
 		return redirect(url_for('index'))
 	return render_template('signup/confirm.html', signup=signup)
 
@@ -89,7 +89,7 @@ def signup_confirm(signup_id, token):
 def signup_confirm_submit(signup_id, token):
 	signup = Signup.query.get(signup_id)
 	if not signup or not secrets.compare_digest(signup.token, token) or signup.expired or signup.completed:
-		flash(_('Invalid signup link'))
+		flash(_('Invalid sign-up link'))
 		return redirect(url_for('index'))
 	confirm_delay = confirm_ratelimit.get_delay(token)
 	host_delay = host_ratelimit.get_delay()

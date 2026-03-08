@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-05 13:46+0100\n"
+"POT-Creation-Date: 2026-03-08 14:53+0100\n"
 "PO-Revision-Date: 2021-05-25 21:18+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -76,7 +76,7 @@ msgid "Unknown"
 msgstr "Unbekannt"
 
 #: uffd/models/signup.py:78 uffd/models/signup.py:103
-msgid "Invalid signup request"
+msgid "Invalid sign-up request"
 msgstr "Ungültiger Account-Registrierungs-Link"
 
 #: uffd/models/signup.py:80
@@ -279,11 +279,11 @@ msgid "Show link as QR code"
 msgstr "Link als QR-Code anzeigen"
 
 #: uffd/templates/invite/list.html:40
-msgid "Signup"
+msgid "Sign-up"
 msgstr "Account-Registrierung"
 
 #: uffd/templates/invite/list.html:44
-msgid "user signups"
+msgid "user sign-ups"
 msgstr "Account-Registrierungen"
 
 #: uffd/templates/invite/list.html:49 uffd/templates/user/show.html:190
@@ -437,7 +437,7 @@ msgstr ""
 
 #: uffd/templates/invite/use.html:16
 msgid "With this link you can register a new user account."
-msgstr "Mit diesem Link kannst du einen Account registieren."
+msgstr "Mit diesem Link kannst du einen Account registrieren."
 
 #: uffd/templates/invite/use.html:28
 msgid "Add the roles to your account now"
@@ -726,7 +726,7 @@ msgstr "Primäre E-Mail-Adresse kann nicht gelöscht werden"
 
 #: uffd/templates/selfservice/self.html:65
 msgid "Retry verification"
-msgstr "Bestätigungslink neusenden"
+msgstr "Bestätigungslink neu senden"
 
 #: uffd/templates/selfservice/self.html:81
 msgid "E-Mail Preferences"
@@ -747,7 +747,7 @@ msgstr ""
 "verwenden."
 
 #: uffd/templates/selfservice/self.html:88
-msgid "Adresses must be verified before you can select them here."
+msgid "Addresses must be verified before you can select them here."
 msgstr "Adressen müssen bestätigt sein, damit du sie hier auswählen kannst."
 
 #: uffd/templates/selfservice/self.html:93
@@ -1048,7 +1048,7 @@ msgid "U2F/FIDO2 support not enabled"
 msgstr "U2F/FIDO2 Unterstützung nicht aktiviert"
 
 #: uffd/templates/selfservice/setup_mfa.html:151
-msgid "Enable javascript in your browser to use U2F and FIDO2 devices!"
+msgid "Enable Javascript in your browser to use U2F and FIDO2 devices!"
 msgstr ""
 "Aktiviere Javascript in deinem Browser, um U2F und FIDO2 Geräte nutzen zu"
 " können!"
@@ -1119,7 +1119,7 @@ msgstr "Registrierung nochmal versuchen"
 #: uffd/templates/selfservice/setup_mfa_recovery.html:8
 msgid ""
 "Recovery codes allow you to login when you lose access to your "
-"authenticator app or U2F/FIDO device. Each code can\n"
+"authenticator app or U2F/FIDO2 device. Each code can\n"
 "\tonly be used once."
 msgstr ""
 "Wiederherstellungscodes erlauben den Login, wenn der Zugriff auf die "
@@ -1370,7 +1370,7 @@ msgstr "Anmeldenamen"
 #: uffd/templates/service/show.html:94
 msgid ""
 "Useful for testing remailer before enabling it for all users. Specify "
-"users as a comma-seperated list of login names."
+"users as a comma-separated list of login names."
 msgstr ""
 "Hilfreich zum Testen des Remailers vor dem Aktivieren für alle Nutzer. Um"
 " Nutzer auszuwählen, liste ihre Anmeldenamen mit Komma getrennt auf."
@@ -1458,7 +1458,7 @@ msgid "Forgot Password?"
 msgstr "Passwort vergessen?"
 
 #: uffd/templates/session/mfa_auth.html:19
-msgid "Enable javascript for authentication with U2F/FIDO2 devices"
+msgid "Enable Javascript for authentication with U2F/FIDO2 devices"
 msgstr "Aktiviere Javascript zur Authentifizierung mit U2F/FIDO2 Geräten"
 
 #: uffd/templates/session/mfa_auth.html:23
@@ -1493,7 +1493,7 @@ msgid "You have not registered any U2F/FIDO2 devices for your account"
 msgstr "Es sind keine U2F/FIDO2-Geräte für deinen Account registriert"
 
 #: uffd/templates/session/mfa_auth.html:74
-msgid "Verifing response"
+msgid "Verifying response"
 msgstr "Überprüfe Antwort"
 
 #: uffd/templates/session/mfa_auth.html:89
@@ -1609,7 +1609,7 @@ msgid "deactivated"
 msgstr "deaktiviert"
 
 #: uffd/templates/user/list.html:60
-msgid "Import a csv formated list of users"
+msgid "Import a CSV-formatted list of users"
 msgstr "Importiere eine als CSV formatierte Liste von Accounts"
 
 #: uffd/templates/user/list.html:67
@@ -1658,7 +1658,7 @@ msgid "User ID"
 msgstr "Account ID"
 
 #: uffd/templates/user/show.html:66
-msgid "will be choosen"
+msgid "will be chosen"
 msgstr "wird automatisch bestimmt"
 
 #: uffd/templates/user/show.html:73
@@ -1797,7 +1797,7 @@ msgid "You are not allowed to create invite links with these permissions"
 msgstr "Dir fehlen Berechtigungen um diesen Einladungslink zu erstellen"
 
 #: uffd/views/invite.py:81
-msgid "Invite link must either allow signup or grant at least one role"
+msgid "Invite link must either allow signing up or grant at least one role"
 msgstr ""
 "Einladungslink muss entweder Account-Registrierung erlauben oder Rollen "
 "vergeben"
@@ -1811,7 +1811,7 @@ msgid "Roles successfully updated"
 msgstr "Rollen erfolgreich geändert"
 
 #: uffd/views/invite.py:149
-msgid "Invite link does not allow signup"
+msgid "Invite link does not allow signing up"
 msgstr "Einladungslink erlaubt keine Account-Registrierung"
 
 #: uffd/views/invite.py:175 uffd/views/selfservice.py:49
@@ -1821,7 +1821,7 @@ msgstr "Die Passwörter stimmen nicht überein"
 
 #: uffd/views/invite.py:181 uffd/views/signup.py:53
 #, python-format
-msgid "Too many signup requests with this mail address! Please wait %(delay)s."
+msgid "Too many sign-up requests with this mail address! Please wait %(delay)s."
 msgstr ""
 "Zu viele Account-Registrierungen mit dieser E-Mail-Adresse! Bitte warte "
 "%(delay)s."
@@ -2074,11 +2074,11 @@ msgid "Invalid initiation code"
 msgstr "Ungültiger Startcode"
 
 #: uffd/views/signup.py:21
-msgid "Signup not enabled"
+msgid "Sign-up not enabled"
 msgstr "Account-Registrierung ist deaktiviert"
 
 #: uffd/views/signup.py:84 uffd/views/signup.py:92
-msgid "Invalid signup link"
+msgid "Invalid sign-up link"
 msgstr "Ungültiger Account-Registrierungs-Link"
 
 #: uffd/views/signup.py:97

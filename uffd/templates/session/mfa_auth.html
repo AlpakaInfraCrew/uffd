@@ -16,7 +16,7 @@
 	{% if login_state.user.mfa_webauthn_methods %}
 	<noscript>
 		<div class="form-group col-12">
-			<div id="webauthn-nojs" class="alert alert-warning" role="alert">{{_("Enable javascript for authentication with U2F/FIDO2 devices")}}</div>
+			<div id="webauthn-nojs" class="alert alert-warning" role="alert">{{_("Enable Javascript for authentication with U2F/FIDO2 devices")}}</div>
 		</div>
 	</noscript>
 	<div id="webauthn-unsupported" class="form-group col-12 d-none">
@@ -71,7 +71,7 @@ function begin_webauthn() {
 		$('#webauthn-btn-text').text({{ _('Waiting for device')|tojson }});
 		return navigator.credentials.get(options);
 	}).then(function(assertion) {
-		$('#webauthn-btn-text').text({{ _('Verifing response')|tojson }});
+		$('#webauthn-btn-text').text({{ _('Verifying response')|tojson }});
 		return fetch({{ url_for('session.mfa_auth_webauthn_complete')|tojson }}, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/cbor'},

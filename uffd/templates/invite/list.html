@@ -37,11 +37,11 @@
 					{% endif %}
 				</td>
 				<td>
-					{{ _('Signup') if invite.allow_signup }}{{ ', ' if invite.allow_signup and invite.roles }}
+					{{ _('Sign-up') if invite.allow_signup }}{{ ', ' if invite.allow_signup and invite.roles }}
 					{% for role in invite.roles %}{{ ', ' if loop.index != 1 }}<i class="fas fa-key"></i>&thinsp;{{ role.name }}{% endfor %}
 				</td>
 				<td>
-					<span style="white-space: nowrap;">{{ invite.signups|selectattr('completed')|list|length }} <i class="fas fa-users" title="{{ _('user signups') }}"></i></span>,
+					<span style="white-space: nowrap;">{{ invite.signups|selectattr('completed')|list|length }} <i class="fas fa-users" title="{{ _('user sign-ups') }}"></i></span>,
 					<span style="white-space: nowrap;">{{ invite.grants|length }} <i class="fas fa-key" title="role grants"></i></span>
 				</td>
 				<td>

@@ -78,7 +78,7 @@ def new_submit():
 		flash(_('You are not allowed to create invite links with these permissions'))
 		return new()
 	if not invite.allow_signup and not invite.roles:
-		flash(_('Invite link must either allow signup or grant at least one role'))
+		flash(_('Invite link must either allow signing up or grant at least one role'))
 		return new()
 	db.session.add(invite)
 	db.session.commit()
@@ -146,7 +146,7 @@ def signup_start(invite_id, token):
 		flash(_('Invalid invite link'))
 		return redirect('/')
 	if not invite.allow_signup:
-		flash(_('Invite link does not allow signup'))
+		flash(_('Invite link does not allow signing up'))
 		return redirect('/')
 	return render_template('signup/start.html')
 
@@ -177,7 +177,7 @@ def signup_submit(invite_id, token):
 	signup_delay = signup_ratelimit.get_delay(request.form['mail'])
 	host_delay = host_ratelimit.get_delay()
 	if signup_delay and signup_delay > host_delay:
-		flash(_('Too many signup requests with this mail address! Please wait %(delay)s.',
+		flash(_('Too many sign-up requests with this mail address! Please wait %(delay)s.',
 		        delay=format_delay(signup_delay)), 'error')
 		return render_template('signup/start.html')
 	if host_delay:

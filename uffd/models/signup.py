@@ -75,7 +75,7 @@ class Signup(db.Model):
 		          is False and `errmsg` contains a string describing why. Otherwise
 		          `valid` is True.'''
 		if self.completed or self.expired:
-			return False, _('Invalid signup request')
+			return False, _('Invalid sign-up request')
 		if not User().set_loginname(self.loginname):
 			return False, _('Login name is invalid')
 		if not User().set_displayname(self.displayname):
@@ -100,7 +100,7 @@ class Signup(db.Model):
 		          `errmsg` contains a string describing why. Otherwise `user` is a
 		          User object.'''
 		if self.completed or self.expired:
-			return None, _('Invalid signup request')
+			return None, _('Invalid sign-up request')
 		if not self.password.verify(password):
 			return None, _('Wrong password')
 		if User.query.filter_by(loginname=self.loginname).all():

@@ -63,7 +63,7 @@
 				{% if user.id %}
 				<input type="number" class="form-control" id="user-uid" name="uid" value="{{ user.unix_uid }}" readonly>
 				{% else %}
-				<input type="text" class="form-control" id="user-uid" name="uid" placeholder="{{_('will be choosen')}}" readonly>
+				<input type="text" class="form-control" id="user-uid" name="uid" placeholder="{{_('will be chosen')}}" readonly>
 				{% endif %}
 			</div>
 			{% if not user.id %}
