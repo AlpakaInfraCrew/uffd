@@ -156,8 +156,7 @@ uffd aims for compliance with OpenID provider conformance profiles Basic and Con
 It is, however, not a certified OpenID provider and it has the following limitations:
 
 * Only the `none` value for the `prompt` authorization request parameter is recognized. Other values (`login`, `consent` and `select_account`) are ignored.
-* The `max_age` authorization request parameter is not supported and ignored by uffd.
-* The `auth_time` claim is not supported and neither returned if the `max_age` authorization request parameter is present nor if it is requested via the `claims` parameter.
+* The `max_age` authorization request parameter is not supported and ignored by uffd (except for its `auth_time` behavior).
 * Requesting the `sub` claim with a specific value for the ID Token (or passing the `id_token_hint` authorization request parameter) is only supported if the `prompt` authorization request parameter is set to `none`. The authorization request is rejected otherwise.
 
 ## Metrics

@@ -1,5 +1,6 @@
 import unittest
 from urllib.parse import urlparse, parse_qs
+import time
 
 import jwt
 from flask import url_for, session
@@ -892,7 +893,18 @@ class TestOIDCBasicProfile(UffdTestCase):
 		self.assertEqual(r.status_code, 302)
 		self.assertTrue(self.is_login_page(r.location))
 
-	# TODO: max_age
+	def test_max_age(self):
+		# max_age is not implemented yet, so only test its auth_time behavior
+		auth_time = int(time.time())
+		self.login_as('user')
+		time.sleep(3)
+		r = self.do_auth_request(response_type='code', max_age='3600')
+		args = self.validate_auth_response(r)
+		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
+		id_token = self.validate_token_response(r)
+		self.assertIn('auth_time', id_token)
+		self.assertLess(id_token['auth_time'] - auth_time, 2)
+		self.assertGreater(id_token['auth_time'] - auth_time, -2)
 
 	def test_sub_value(self):
 		# Via id_token_hint or claims.id_token.sub.value

@@ -1,6 +1,7 @@
 import urllib.parse
 import time
 import json
+import datetime
 
 from flask import Blueprint, request, jsonify, render_template, session, redirect, url_for, flash, abort
 from flask_babel import gettext as _
@@ -50,18 +51,19 @@ OIDC_SCOPES = {
 }
 
 OIDC_CLAIMS = {
-	'sub': lambda service_user: str(service_user.user.unix_uid),
-	'name': lambda service_user: service_user.user.displayname,
-	'preferred_username': lambda service_user: service_user.user.loginname,
-	'email': lambda service_user: service_user.email,
-	'email_verified': lambda service_user: service_user.email_verified,
+	'sub': lambda tok: str(tok.session.user.unix_uid),
+	'name': lambda tok: tok.session.user.displayname,
+	'preferred_username': lambda tok: tok.session.user.loginname,
+	'email': lambda tok: tok.service_user.email,
+	'email_verified': lambda tok: tok.service_user.email_verified,
+	'auth_time': lambda tok: int(tok.session.created.replace(tzinfo=datetime.timezone.utc).timestamp()),
 	# RFC 9068 registers the "groups" claim with a syntax taken from SCIM (RFC 7643)
 	# that is different from what we use here. The plain list of names syntax we use
 	# is far more common in the context of id_token/userinfo claims.
-	'groups': lambda service_user: [group.name for group in service_user.user.groups]
+	'groups': lambda tok: [group.name for group in tok.session.user.groups]
 }
 
-def render_claims(scopes, claims, service_user):
+def render_claims(scopes, claims, tok):
 	claims = dict(claims)
 	for scope in scopes:
 		claims.update(OIDC_SCOPES.get(scope, {}))
@@ -69,7 +71,7 @@ def render_claims(scopes, claims, service_user):
 	res = {}
 	for claim, func in OIDC_CLAIMS.items():
 		if claim in claims:
-			res[claim] = func(service_user=service_user)
+			res[claim] = func(tok)
 	return res
 
 bp = Blueprint('oauth2', __name__, template_folder='templates')
@@ -224,6 +226,12 @@ def authorize_validate_request_oidc(grant):
 	prompt_values = {value for value in request.args.get('prompt', '').split(' ') if value}
 	if 'none' in prompt_values and prompt_values != {'none'}:
 		raise InvalidRequestError(error_description='Invalid usage of none prompt parameter value')
+
+	if 'max_age' in request.args:
+		# We don't support max_age yet, but we implement its auth_time behavior
+		claims.setdefault('id_token', {}).setdefault('auth_time', None)
+		claims['id_token']['auth_time'] = claims['id_token']['auth_time'] or {}
+		claims['id_token']['auth_time']['essential'] = True
 
 	sub_value = None
 	if claims.get('id_token', {}).get('sub', {}).get('value') is not None:
@@ -422,7 +430,7 @@ def token():
 	}
 	if 'openid' in tok.scopes:
 		key = OAuth2Key.get_preferred_key()
-		id_token = render_claims(['openid'], grant.claims.get('id_token', {}), tok.service_user)
+		id_token = render_claims(['openid'], grant.claims.get('id_token', {}), tok)
 		id_token['iss'] = get_issuer()
 		id_token['aud'] = tok.client.client_id
 		id_token['iat'] = int(time.time())
@@ -470,10 +478,10 @@ def userinfo():
 			header += f' error="{err.ERROR}"'
 		return '', 401, {'WWW-Authenticate': [header]}
 
-	service_user = tok.service_user
 	if 'openid' in tok.scopes:
-		resp = render_claims(tok.scopes, tok.claims.get('userinfo', {}), service_user)
+		resp = render_claims(tok.scopes, tok.claims.get('userinfo', {}), tok)
 	else:
+		service_user = tok.service_user
 		resp = {
 			'id': service_user.user.unix_uid,
 			'name': service_user.user.displayname,
