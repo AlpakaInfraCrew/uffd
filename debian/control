@@ -30,6 +30,7 @@ Depends:
  python3-itsdangerous,
  uwsgi,
  uwsgi-plugin-python3,
+ python3 (< 3.13) | python3-crypt-r,
 Recommends:
  nginx,
  python3-mysqldb,
