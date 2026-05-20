@@ -175,15 +175,15 @@ def resolve_remailer():
 @bp.route('/metrics_prometheus', methods=['GET'])
 @apikey_required('metrics')
 def prometheus_metrics():
-	import pkg_resources #pylint: disable=import-outside-toplevel
+	import importlib.metadata #pylint: disable=import-outside-toplevel
 	from prometheus_client.core import CollectorRegistry, CounterMetricFamily, InfoMetricFamily #pylint: disable=import-outside-toplevel
 	from prometheus_client import PLATFORM_COLLECTOR, generate_latest, CONTENT_TYPE_LATEST #pylint: disable=import-outside-toplevel
 
 	class UffdCollector():
 		def collect(self):
 			try:
-				uffd_version = str(pkg_resources.get_distribution('uffd').version)
-			except pkg_resources.DistributionNotFound:
+				uffd_version = str(importlib.metadata.version('uffd'))
+			except importlib.metadata.PackageNotFoundError:
 				uffd_version = "unknown"
 			yield InfoMetricFamily('uffd_version', 'Various version infos', value={"version": uffd_version})
 
