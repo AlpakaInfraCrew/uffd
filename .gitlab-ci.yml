@@ -225,21 +225,6 @@ test:package:pip:bookworm:
 # Since we want to test if the package installs correctly on a fresh Debian
 # install (has correct dependencies, etc.), we don't use uffd/docker-images
 # here
-test:package:apt:bullseye:
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/debian:bullseye
-  stage: test
-  needs:
-  - job: build:apt
-  before_script: []
-  script:
-  - apt -y update
-  - apt -y install curl ./*.deb
-  - service uwsgi start uffd || ( service uwsgi status uffd ; sleep 15; cat /var/log/uwsgi/app/uffd.log; )
-  - echo "server { listen 127.0.0.1:5000 default_server;  include /etc/uffd/nginx.include.conf; }" > /etc/nginx/sites-enabled/uffd.ini
-  - service nginx start || ( service nginx status; nginx -t; exit 1; )
-  - uffd-admin routes
-  - curl -Lv 127.0.0.1:5000
-
 test:package:apt:bookworm:
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/debian:bookworm
   stage: test
