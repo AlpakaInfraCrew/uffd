@@ -111,6 +111,7 @@ def token_password(token_id, token):
 
 @bp.route("/email/new", methods=['POST'])
 @login_required(selfservice_acl_check)
+@csrf_protect(blueprint=bp)
 def add_email():
 	email = UserEmail(user=request.user)
 	if not email.set_address(request.form['address']):
@@ -159,6 +160,7 @@ def verify_email(secret, email_id=None, legacy_id=None):
 
 @bp.route("/email/<int:email_id>/retry")
 @login_required(selfservice_acl_check)
+@csrf_protect(blueprint=bp)
 def retry_email_verification(email_id):
 	email = UserEmail.query.filter_by(id=email_id, user=request.user, verified=False).first_or_404()
 	secret = email.start_verification()
@@ -171,6 +173,7 @@ def retry_email_verification(email_id):
 
 @bp.route("/email/<int:email_id>/delete", methods=['POST', 'GET'])
 @login_required(selfservice_acl_check)
+@csrf_protect(blueprint=bp)
 def delete_email(email_id):
 	email = UserEmail.query.filter_by(id=email_id, user=request.user).first_or_404()
 	try:
@@ -184,6 +187,7 @@ def delete_email(email_id):
 
 @bp.route("/email/preferences", methods=['POST'])
 @login_required(selfservice_acl_check)
+@csrf_protect(blueprint=bp)
 def update_email_preferences():
 	verified_emails = UserEmail.query.filter_by(user=request.user, verified=True)
 	request.user.primary_email = verified_emails.filter_by(id=request.form['primary_email']).one()
