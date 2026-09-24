@@ -17,7 +17,7 @@ depends_on = None
 
 def upgrade():
 	conn = op.get_bind()
-	meta = sa.MetaData(bind=conn)
+	meta = sa.MetaData()
 	user_table = sa.Table('user', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('unix_uid', sa.Integer(), nullable=False),
@@ -57,7 +57,7 @@ def upgrade():
 	# Completely block range USER_MAX_UID to max UID currently in use (within
 	# the UID range) to account for users deleted in the past.
 	max_user_uid = conn.execute(
-		sa.select([sa.func.max(user_table.c.unix_uid)])
+		sa.select(sa.func.max(user_table.c.unix_uid))
 		.where(user_table.c.unix_uid <= current_app.config['USER_MAX_UID'])
 	).scalar() or 0
 	insert_data = []
@@ -66,7 +66,7 @@ def upgrade():
 			insert_data.append({'id': uid})
 	op.bulk_insert(uid_allocation_table, insert_data)
 	max_service_uid = conn.execute(
-		sa.select([sa.func.max(user_table.c.unix_uid)])
+		sa.select(sa.func.max(user_table.c.unix_uid))
 		.where(user_table.c.unix_uid <= current_app.config['USER_SERVICE_MAX_UID'])
 	).scalar() or 0
 	insert_data = []
@@ -78,7 +78,7 @@ def upgrade():
 	# Also block all UIDs outside of both ranges that are in use
 	# (just to be sure, there should not be any)
 	conn.execute(sa.insert(uid_allocation_table).from_select(['id'],
-		sa.select([user_table.c.unix_uid]).where(sa.and_(
+		sa.select(user_table.c.unix_uid).where(sa.and_(
 			# Out of range for user
 			sa.or_(
 				user_table.c.unix_uid < current_app.config['USER_MIN_UID'],
@@ -106,7 +106,7 @@ def upgrade():
 	# Completely block range GROUP_MAX_GID to max GID currently in use (within
 	# the GID range) to account for groups deleted in the past.
 	max_group_gid = conn.execute(
-		sa.select([sa.func.max(group_table.c.unix_gid)])
+		sa.select(sa.func.max(group_table.c.unix_gid))
 		.where(group_table.c.unix_gid <= current_app.config['GROUP_MAX_GID'])
 	).scalar() or 0
 	insert_data = []
@@ -116,7 +116,7 @@ def upgrade():
 	op.bulk_insert(gid_allocation_table, insert_data)
 	# Also block out-of-range GIDs
 	conn.execute(sa.insert(gid_allocation_table).from_select(['id'],
-		sa.select([group_table.c.unix_gid]).where(
+		sa.select(group_table.c.unix_gid).where(
 			sa.or_(
 				group_table.c.unix_gid < current_app.config['GROUP_MIN_GID'],
 				group_table.c.unix_gid > current_app.config['GROUP_MAX_GID']
@@ -128,7 +128,7 @@ def upgrade():
 		batch_op.create_foreign_key(batch_op.f('fk_group_unix_gid_gid_allocation'), 'gid_allocation', ['unix_gid'], ['id'])
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	user_table = sa.Table('user', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('unix_uid', sa.Integer(), nullable=False),

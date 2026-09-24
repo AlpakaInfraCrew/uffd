@@ -19,7 +19,7 @@ def upgrade():
 		batch_op.add_column(sa.Column('locked', sa.Boolean(create_constraint=True, name=op.f('ck_role_locked')), nullable=False, default=False))
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	table = sa.Table('role', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('name', sa.String(length=32), nullable=True),

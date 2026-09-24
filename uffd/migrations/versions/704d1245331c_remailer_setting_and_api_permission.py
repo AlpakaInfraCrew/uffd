@@ -24,7 +24,7 @@ def upgrade():
 		batch_op.add_column(sa.Column('perm_remailer', sa.Boolean(create_constraint=True), nullable=False, server_default=sa.false()))
 	with op.batch_alter_table('service') as batch_op:
 		batch_op.add_column(sa.Column('use_remailer', sa.Boolean(create_constraint=True), nullable=False, server_default=sa.false()))
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	api_client = sa.Table('api_client', meta,
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('service_id', sa.Integer(), nullable=False),
@@ -54,7 +54,7 @@ def upgrade():
 		batch_op.alter_column('use_remailer', server_default=None)
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	api_client = sa.Table('api_client', meta,
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('service_id', sa.Integer(), nullable=False),

@@ -39,7 +39,7 @@ def upgrade():
 		batch_op.add_column(sa.Column('address_normalized', sa.String(length=128), nullable=True))
 		batch_op.add_column(sa.Column('enable_strict_constraints', sa.Boolean(create_constraint=True), nullable=True))
 		batch_op.alter_column('verified', existing_type=sa.Boolean(create_constraint=True), nullable=True)
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	user_email_table = sa.Table('user_email', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('user_id', sa.Integer(), nullable=True),
@@ -75,7 +75,7 @@ def upgrade():
 	)
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	user_email_table = sa.Table('user_email', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('user_id', sa.Integer(), nullable=True),

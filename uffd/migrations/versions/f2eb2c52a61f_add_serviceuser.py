@@ -25,7 +25,7 @@ def upgrade():
 	user = sa.table('user', sa.column('id'))
 	op.execute(service_user.insert().from_select(
 		['service_id', 'user_id'],
-		sa.select([service.c.id, user.c.id]).select_from(sa.join(service, user, sa.true()))
+		sa.select(service.c.id, user.c.id).select_from(sa.join(service, user, sa.true()))
 	))
 
 def downgrade():

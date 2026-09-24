@@ -46,7 +46,7 @@ def upgrade():
 	logger.info('Generating 3072 bit RSA key pair (RS256) for OpenID Connect support ...')
 	private_key = rsa.generate_private_key(public_exponent=65537, key_size=3072, backend=default_backend())
 
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	oauth2_key = op.create_table('oauth2_key',
 		sa.Column('id', sa.String(length=64), nullable=False),
 		sa.Column('created', sa.DateTime(), nullable=False),
@@ -104,7 +104,7 @@ def upgrade():
 		batch_op.add_column(sa.Column('claims', sa.Text(), nullable=True))
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 
 	oauth2token = sa.Table('oauth2token', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),

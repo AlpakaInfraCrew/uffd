@@ -15,7 +15,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	table = sa.Table('role-group', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('dn', sa.String(length=128), nullable=True),
@@ -35,7 +35,7 @@ def upgrade():
 		batch_op.create_primary_key(batch_op.f('pk_role-group'), ['role_id', 'group_dn'])
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	table = sa.Table('role-group', meta,
 		sa.Column('role_id', sa.Integer(), nullable=False),
 		sa.Column('group_dn', sa.String(128), nullable=False),
@@ -55,7 +55,7 @@ def downgrade():
 		batch_op.alter_column('id', autoincrement=True, nullable=False, existing_type=sa.Integer())
 		# For some reason MySQL ignores this statement
 		#batch_op.create_unique_constraint(op.f('uq_role-group_dn'), ['dn', 'role_id'])
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	table = sa.Table('role-group', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('dn', sa.String(length=128), nullable=True),

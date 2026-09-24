@@ -33,7 +33,7 @@ invite_signup = sa.sql.table('invite_signup',
 
 def upgrade():
 	# CHECK constraints get lost when reflecting from the actual table
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	table = sa.Table('invite', meta,
 		sa.Column('token', sa.String(length=128), nullable=False),
 		sa.Column('created', sa.DateTime(), nullable=False),
@@ -63,9 +63,9 @@ def upgrade():
 	with op.batch_alter_table('invite_signup', schema=None) as batch_op:
 		batch_op.add_column(sa.Column('invite_id', sa.Integer(), nullable=True))
 
-	op.execute(invite_grant.update().values(invite_id=sa.select([invite.c.id]).where(invite.c.token==invite_grant.c.invite_token).as_scalar()))
-	op.execute(invite_roles.update().values(invite_id=sa.select([invite.c.id]).where(invite.c.token==invite_roles.c.invite_token).as_scalar()))
-	op.execute(invite_signup.update().values(invite_id=sa.select([invite.c.id]).where(invite.c.token==invite_signup.c.invite_token).as_scalar()))
+	op.execute(invite_grant.update().values(invite_id=sa.select(invite.c.id).where(invite.c.token==invite_grant.c.invite_token).as_scalar()))
+	op.execute(invite_roles.update().values(invite_id=sa.select(invite.c.id).where(invite.c.token==invite_roles.c.invite_token).as_scalar()))
+	op.execute(invite_signup.update().values(invite_id=sa.select(invite.c.id).where(invite.c.token==invite_signup.c.invite_token).as_scalar()))
 
 	with op.batch_alter_table('invite_grant', schema=None) as batch_op:
 		batch_op.alter_column('invite_id', existing_type=sa.INTEGER(), nullable=False)
@@ -92,9 +92,9 @@ def downgrade():
 		batch_op.drop_constraint(batch_op.f('fk_invite_grant_invite_id_invite'), type_='foreignkey')
 		batch_op.add_column(sa.Column('invite_token', sa.VARCHAR(length=128), nullable=True))
 
-	op.execute(invite_grant.update().values(invite_token=sa.select([invite.c.token]).where(invite.c.id==invite_grant.c.invite_id).as_scalar()))
-	op.execute(invite_roles.update().values(invite_token=sa.select([invite.c.token]).where(invite.c.id==invite_roles.c.invite_id).as_scalar()))
-	op.execute(invite_signup.update().values(invite_token=sa.select([invite.c.token]).where(invite.c.id==invite_signup.c.invite_id).as_scalar()))
+	op.execute(invite_grant.update().values(invite_token=sa.select(invite.c.token).where(invite.c.id==invite_grant.c.invite_id).as_scalar()))
+	op.execute(invite_roles.update().values(invite_token=sa.select(invite.c.token).where(invite.c.id==invite_roles.c.invite_id).as_scalar()))
+	op.execute(invite_signup.update().values(invite_token=sa.select(invite.c.token).where(invite.c.id==invite_signup.c.invite_id).as_scalar()))
 
 	with op.batch_alter_table('invite_signup', schema=None) as batch_op:
 		batch_op.alter_column('invite_token', existing_type=sa.VARCHAR(length=128), nullable=False)
@@ -109,7 +109,7 @@ def downgrade():
 		batch_op.drop_column('invite_id')
 
 	# CHECK constraints get lost when reflecting from the actual table
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	table = sa.Table('invite', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('token', sa.String(length=128), nullable=False),

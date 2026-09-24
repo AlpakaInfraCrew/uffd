@@ -298,7 +298,7 @@ class TestIDAllocator(ModelTestCase):
 
 	def fetch_gid_allocations(self):
 		return [row[0] for row in db.session.execute(
-			db.select([Group.unix_gid_allocator.allocation_table])
+			db.select(Group.unix_gid_allocator.allocation_table)
 			.order_by(Group.unix_gid_allocator.allocation_table.c.id)
 		).fetchall()]
 

@@ -87,7 +87,6 @@ class Role(db.Model):
 	                               primaryjoin=id == role_inclusion.c.role_id,
 	                               secondaryjoin=id == role_inclusion.c.included_role_id,
 																 backref='including_roles')
-	including_roles = [] # overwritten by backref
 
 	moderator_group_id = Column(Integer(), ForeignKey('group.id', onupdate='CASCADE', ondelete='SET NULL'), nullable=True)
 	moderator_group = relationship('Group')

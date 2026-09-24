@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, text
 from logging.config import fileConfig
 import logging
 import click
@@ -76,13 +76,13 @@ def run_migrations_online():
                       process_revision_directives=process_revision_directives,
                       **current_app.extensions['migrate'].configure_args)
     if engine.name in ('mysql', 'mariadb'):
-        character_set_connection = connection.execute('SHOW VARIABLES LIKE "character_set_connection"').fetchone()[1]
+        character_set_connection = connection.execute(text('SHOW VARIABLES LIKE "character_set_connection"')).fetchone()[1]
         if character_set_connection != 'utf8mb4':
             raise click.ClickException(f'Unsupported connection charset "{character_set_connection}". Make sure to add "?charset=utf8mb4" to SQLALCHEMY_DATABASE_URI!')
-        collation_database = connection.execute('SHOW VARIABLES LIKE "collation_database"').fetchone()[1]
+        collation_database = connection.execute(text('SHOW VARIABLES LIKE "collation_database"')).fetchone()[1]
         if collation_database != 'utf8mb4_nopad_bin':
             raise click.ClickException(f'Unsupported database collation "{collation_database}". Create the database with "CHARACTER SET utf8mb4 COLLATE utf8mb4_nopad_bin"!')
-        connection.execute('SET NAMES utf8mb4 COLLATE utf8mb4_nopad_bin')
+        connection.execute(text('SET NAMES utf8mb4 COLLATE utf8mb4_nopad_bin'))
 
     try:
         with context.begin_transaction():

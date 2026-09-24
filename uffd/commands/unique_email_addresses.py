@@ -17,7 +17,7 @@ def unique_email_addresses_command():
 def enable_unique_email_addresses_command():
 	if FeatureFlag.unique_email_addresses:
 		raise click.ClickException('Uniqueness checks for e-mail addresses are already enabled')
-	query = db.select([UserEmail.address_normalized, UserEmail.user_id])\
+	query = db.select(UserEmail.address_normalized, UserEmail.user_id)\
 		.group_by(UserEmail.address_normalized, UserEmail.user_id)\
 		.having(db.func.count(UserEmail.id.distinct()) > 1)
 	for address_normalized, user_id in db.session.execute(query).fetchall():
@@ -30,7 +30,7 @@ def enable_unique_email_addresses_command():
 			else:
 				click.echo(f'- {user_email.address} (unverified)', err=True)
 		click.echo()
-	query = db.select([UserEmail.address_normalized, UserEmail.address])\
+	query = db.select(UserEmail.address_normalized, UserEmail.address)\
 		.where(UserEmail.verified)\
 		.group_by(UserEmail.address_normalized)\
 		.having(db.func.count(UserEmail.id.distinct()) > 1)

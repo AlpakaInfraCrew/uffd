@@ -147,15 +147,13 @@ class ServiceUser(db.Model):
 		query = query.join(cls.service.of_type(AliasedService))
 
 		remailer_enabled = db.case(
-			whens=[
-				(db.not_(remailer.configured), False),
-				(
-					db.not_(AliasedUser.loginname.in_(current_app.config['REMAILER_LIMIT_TO_USERS']))
-						if current_app.config['REMAILER_LIMIT_TO_USERS'] is not None else db.and_(False),
-					False
-				),
-				(cls.remailer_overwrite_mode != None, cls.remailer_overwrite_mode != RemailerMode.DISABLED)
-			],
+			(db.not_(remailer.configured), False),
+			(
+				db.not_(AliasedUser.loginname.in_(current_app.config['REMAILER_LIMIT_TO_USERS']))
+					if current_app.config['REMAILER_LIMIT_TO_USERS'] is not None else db.and_(False),
+				False
+			),
+			(cls.remailer_overwrite_mode != None, cls.remailer_overwrite_mode != RemailerMode.DISABLED),
 			else_=(AliasedService.remailer_mode != RemailerMode.DISABLED)
 		)
 		has_access = db.or_(
@@ -170,10 +168,8 @@ class ServiceUser(db.Model):
 			AliasedService.enable_email_preferences,
 		)
 		real_email_matches = db.case(
-			whens=[
-				# pylint: disable=singleton-comparison
-				(db.and_(has_email_preferences, cls.service_email != None), AliasedServiceEmail.address == email),
-			],
+			# pylint: disable=singleton-comparison
+			(db.and_(has_email_preferences, cls.service_email != None), AliasedServiceEmail.address == email),
 			else_=(AliasedPrimaryEmail.address == email)
 		)
 		return query.filter(db.and_(db.not_(remailer_enabled), real_email_matches))
@@ -188,7 +184,7 @@ def create_service_users(session, flush_context): # pylint: disable=unused-argum
 		return
 	db.session.execute(db.insert(ServiceUser).from_select(
 		['service_id', 'user_id'],
-		db.select([Service.id, User.id]).select_from(db.join(Service, User, db.true())).where(db.or_(
+		db.select(Service.id, User.id).select_from(db.join(Service, User, db.true())).where(db.or_(
 			Service.id.in_(new_service_ids),
 			User.id.in_(new_user_ids),
 		))
@@ -203,7 +199,7 @@ def create_missing_service_users():
 	# pylint: disable=no-member
 	db.session.execute(db.insert(ServiceUser).from_select(
 		['service_id', 'user_id'],
-		db.select([Service.id, User.id]).select_from(db.join(Service, User, db.true())).where(db.not_(
+		db.select(Service.id, User.id).select_from(db.join(Service, User, db.true())).where(db.not_(
 			ServiceUser.query.filter(
 				ServiceUser.service_id == Service.id,
 				ServiceUser.user_id == User.id

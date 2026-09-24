@@ -18,7 +18,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	role_groups = sa.Table('role_groups', meta,
 		sa.Column('role_id', sa.Integer(), nullable=False),
 		sa.Column('group_id', sa.Integer(), nullable=True),
@@ -31,7 +31,7 @@ def upgrade():
 		batch_op.alter_column('group_id', existing_type=sa.INTEGER(), nullable=False)
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	role_groups = sa.Table('role_groups', meta,
 		sa.Column('role_id', sa.Integer(), nullable=False),
 		sa.Column('group_id', sa.Integer(), nullable=False),

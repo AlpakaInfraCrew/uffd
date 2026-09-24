@@ -14,7 +14,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	ratelimit_event = sa.Table('ratelimit_event', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('timestamp', sa.DateTime(), nullable=True),
@@ -29,7 +29,7 @@ def upgrade():
 		batch_op.alter_column('timestamp', existing_type=sa.DATETIME(), nullable=False)
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	ratelimit_event = sa.Table('ratelimit_event', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('timestamp', sa.DateTime(), nullable=False),

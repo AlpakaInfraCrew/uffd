@@ -49,7 +49,7 @@ def upgrade():
 
 def downgrade():
 	# We don't drop and recreate the table here to improve fuzzy migration test coverage
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	session = sa.table('session',
 		sa.column('id', sa.Integer),
 		sa.column('user_id', sa.Integer()),
@@ -74,7 +74,7 @@ def downgrade():
 		sa.UniqueConstraint('access_token', name=op.f('uq_oauth2token_access_token')),
 		sa.UniqueConstraint('refresh_token', name=op.f('uq_oauth2token_refresh_token'))
 	)
-	op.execute(oauth2token.update().values(user_id=sa.select([session.c.user_id]).where(oauth2token.c.session_id==session.c.id).as_scalar()))
+	op.execute(oauth2token.update().values(user_id=sa.select(session.c.user_id).where(oauth2token.c.session_id==session.c.id).as_scalar()))
 	op.execute(oauth2token.delete().where(oauth2token.c.user_id==None))
 	with op.batch_alter_table('oauth2token', copy_from=oauth2token) as batch_op:
 		batch_op.alter_column('user_id', nullable=False, existing_type=sa.Integer())
@@ -99,7 +99,7 @@ def downgrade():
 		sa.ForeignKeyConstraint(['session_id'], ['session.id'], name=op.f('fk_oauth2grant_session_id_session'), onupdate='CASCADE', ondelete='CASCADE'),
 		sa.PrimaryKeyConstraint('id', name=op.f('pk_oauth2grant'))
 	)
-	op.execute(oauth2grant.update().values(user_id=sa.select([session.c.user_id]).where(oauth2grant.c.session_id==session.c.id).as_scalar()))
+	op.execute(oauth2grant.update().values(user_id=sa.select(session.c.user_id).where(oauth2grant.c.session_id==session.c.id).as_scalar()))
 	op.execute(oauth2grant.delete().where(oauth2grant.c.user_id==None))
 	with op.batch_alter_table('oauth2grant', copy_from=oauth2grant) as batch_op:
 		batch_op.alter_column('user_id', nullable=False, existing_type=sa.Integer())

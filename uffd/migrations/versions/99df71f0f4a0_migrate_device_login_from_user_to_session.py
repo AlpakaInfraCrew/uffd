@@ -33,7 +33,7 @@ def downgrade():
 	# We don't drop and recreate the table here to improve fuzzy migration test coverage
 	with op.batch_alter_table('device_login_confirmation', schema=None) as batch_op:
 		batch_op.add_column(sa.Column('user_id', sa.Integer(), nullable=True))
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	device_login_confirmation = sa.Table('device_login_confirmation', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('initiation_id', sa.Integer(), nullable=False),
@@ -52,7 +52,7 @@ def downgrade():
 		sa.column('id', sa.Integer),
 		sa.column('user_id', sa.Integer()),
 	)
-	op.execute(device_login_confirmation.update().values(user_id=sa.select([session.c.user_id]).where(device_login_confirmation.c.session_id==session.c.id).as_scalar()))
+	op.execute(device_login_confirmation.update().values(user_id=sa.select(session.c.user_id).where(device_login_confirmation.c.session_id==session.c.id).as_scalar()))
 	op.execute(device_login_confirmation.delete().where(device_login_confirmation.c.user_id==None))
 	with op.batch_alter_table('device_login_confirmation', copy_from=device_login_confirmation) as batch_op:
 		batch_op.alter_column('user_id', nullable=False, existing_type=sa.Integer())

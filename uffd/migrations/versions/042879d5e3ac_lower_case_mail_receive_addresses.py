@@ -15,7 +15,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	mail_receive_address_table = sa.Table('mail_receive_address', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('mail_id', sa.Integer(), nullable=False),

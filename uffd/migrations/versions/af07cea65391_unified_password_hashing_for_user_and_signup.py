@@ -14,7 +14,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	signup = sa.Table('signup', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('token', sa.String(length=128), nullable=False),
@@ -48,7 +48,7 @@ def upgrade():
 	op.execute(signup.update().values(pwhash=('{crypt}' + signup.c.pwhash)))
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	signup = sa.Table('signup', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('token', sa.String(length=128), nullable=False),

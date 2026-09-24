@@ -15,7 +15,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	service_user = sa.Table('service_user', meta,
 		sa.Column('service_id', sa.Integer(), nullable=False),
 		sa.Column('user_id', sa.Integer(), nullable=False),
@@ -29,7 +29,7 @@ def upgrade():
 		batch_op.add_column(sa.Column('remailer_overwrite_mode', sa.Enum('DISABLED', 'ENABLED_V1', 'ENABLED_V2', create_constraint=True, name='remailermode'), nullable=True))
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	service_user = sa.Table('service_user', meta,
 		sa.Column('service_id', sa.Integer(), nullable=False),
 		sa.Column('user_id', sa.Integer(), nullable=False),

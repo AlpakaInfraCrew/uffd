@@ -6,7 +6,7 @@ from tests.utils import MigrationTestCase
 class TestForMissingLockRows(MigrationTestCase):
 	def test_check_missing_lock_rows(self):
 		self.upgrade('head')
-		existing_locks = {row[0] for row in db.session.execute(db.select([lock_table.c.name])).fetchall()}
+		existing_locks = {row[0] for row in db.session.execute(db.select(lock_table.c.name)).fetchall()}
 		for name in Lock.ALL_LOCKS - existing_locks:
 			self.fail(f'Lock "{name}" is missing. Make sure to add a migration that inserts it.')
 

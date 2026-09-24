@@ -14,7 +14,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	api_client = sa.Table('api_client', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('service_id', sa.Integer(), nullable=False),
@@ -32,7 +32,7 @@ def upgrade():
 		batch_op.add_column(sa.Column('perm_metrics', sa.Boolean(create_constraint=True), nullable=False, server_default=sa.false()))
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	api_client = sa.Table('api_client', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('service_id', sa.Integer(), nullable=False),

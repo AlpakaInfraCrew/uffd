@@ -222,7 +222,7 @@ class TestUserViews(UffdTestCase):
 		email = UserEmail(user=user, address='foo@example.com')
 		service1 = Service(name='service1', enable_email_preferences=True, limit_access=False)
 		service2 = Service(name='service2', enable_email_preferences=True, limit_access=False)
-		db.session.add_all([service1, service2])
+		db.session.add_all([email, service1, service2])
 		db.session.commit()
 		email1_id = user.primary_email.id
 		email2_id = email.id
@@ -278,7 +278,7 @@ class TestUserViews(UffdTestCase):
 		email = UserEmail(user=user, address='foo@example.com')
 		service1 = Service(name='service1', enable_email_preferences=True, limit_access=False)
 		service2 = Service(name='service2', enable_email_preferences=True, limit_access=False)
-		db.session.add_all([service1, service2])
+		db.session.add_all([email, service1, service2])
 		db.session.commit()
 		email1_id = user.primary_email.id
 		email2_id = email.id

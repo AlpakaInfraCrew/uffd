@@ -19,7 +19,7 @@ def upgrade():
 	with op.batch_alter_table('service_user', schema=None) as batch_op:
 		batch_op.add_column(sa.Column('service_email_id', sa.Integer(), nullable=True))
 		batch_op.create_foreign_key(batch_op.f('fk_service_user_service_email_id_user_email'), 'user_email', ['service_email_id'], ['id'], onupdate='CASCADE', ondelete='SET NULL')
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	service = sa.Table('service', meta,
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),

@@ -25,7 +25,7 @@ def upgrade():
 	# with the data from the original table.
 
 	# First recreate tables that have (unnamed) foreign keys without any foreign keys
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	table = sa.Table('invite_grant', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('invite_token', sa.String(length=128), nullable=False),
@@ -75,7 +75,7 @@ def upgrade():
 		pass
 
 	# Then recreate all tables with properly named constraints and readd foreign key constraints
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	table = sa.Table('invite', meta,
 		sa.Column('token', sa.String(length=128), nullable=False),
 		sa.Column('created', sa.DateTime(), nullable=False),

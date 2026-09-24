@@ -94,7 +94,7 @@ def upgrade():
 			services[service_name] = (False, None)
 		api_clients.append((service_name, auth_username, auth_password, perm_users, perm_checkpassword, perm_mail_aliases))
 
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 
 	service_table = op.create_table('service',
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -111,7 +111,7 @@ def upgrade():
 	)
 	for service_name, args in services.items():
 		limit_access, access_group_name = args
-		op.execute(service_table.insert().values(name=service_name, limit_access=limit_access, access_group_id=sa.select([group_table.c.id]).where(group_table.c.name==access_group_name).as_scalar()))
+		op.execute(service_table.insert().values(name=service_name, limit_access=limit_access, access_group_id=sa.select(group_table.c.id).where(group_table.c.name==access_group_name).as_scalar()))
 
 	api_client_table = op.create_table('api_client',
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -126,7 +126,7 @@ def upgrade():
 		sa.UniqueConstraint('auth_username', name=op.f('uq_api_client_auth_username'))
 	)
 	for service_name, auth_username, auth_password, perm_users, perm_checkpassword, perm_mail_aliases in api_clients:
-		op.execute(api_client_table.insert().values(service_id=sa.select([service_table.c.id]).where(service_table.c.name==service_name).as_scalar(), auth_username=auth_username, auth_password=hash_sha512(auth_password), perm_users=perm_users, perm_checkpassword=perm_checkpassword, perm_mail_aliases=perm_mail_aliases))
+		op.execute(api_client_table.insert().values(service_id=sa.select(service_table.c.id).where(service_table.c.name==service_name).as_scalar(), auth_username=auth_username, auth_password=hash_sha512(auth_password), perm_users=perm_users, perm_checkpassword=perm_checkpassword, perm_mail_aliases=perm_mail_aliases))
 
 	oauth2client_table = op.create_table('oauth2client',
 		sa.Column('db_id', sa.Integer(), autoincrement=True, nullable=False),
@@ -153,11 +153,11 @@ def upgrade():
 		sa.PrimaryKeyConstraint('id', name=op.f('pk_oauth2redirect_uri'))
 	)
 	for service_name, client_id, client_secret, redirect_uris, logout_uris in oauth2_clients:
-		op.execute(oauth2client_table.insert().values(service_id=sa.select([service_table.c.id]).where(service_table.c.name==service_name).as_scalar(), client_id=client_id, client_secret=hash_sha512(client_secret)))
+		op.execute(oauth2client_table.insert().values(service_id=sa.select(service_table.c.id).where(service_table.c.name==service_name).as_scalar(), client_id=client_id, client_secret=hash_sha512(client_secret)))
 		for method, uri, in logout_uris:
-			op.execute(oauth2logout_uri_table.insert().values(client_db_id=sa.select([oauth2client_table.c.db_id]).where(oauth2client_table.c.client_id==client_id).as_scalar(), method=method, uri=uri))
+			op.execute(oauth2logout_uri_table.insert().values(client_db_id=sa.select(oauth2client_table.c.db_id).where(oauth2client_table.c.client_id==client_id).as_scalar(), method=method, uri=uri))
 		for uri in redirect_uris:
-			op.execute(oauth2redirect_uri_table.insert().values(client_db_id=sa.select([oauth2client_table.c.db_id]).where(oauth2client_table.c.client_id==client_id).as_scalar(), uri=uri))
+			op.execute(oauth2redirect_uri_table.insert().values(client_db_id=sa.select(oauth2client_table.c.db_id).where(oauth2client_table.c.client_id==client_id).as_scalar(), uri=uri))
 
 	with op.batch_alter_table('device_login_initiation', schema=None) as batch_op:
 		batch_op.add_column(sa.Column('oauth2_client_db_id', sa.Integer(), nullable=True))
@@ -176,7 +176,7 @@ def upgrade():
 		sa.UniqueConstraint('code0', name=op.f('uq_device_login_initiation_code0')),
 		sa.UniqueConstraint('code1', name=op.f('uq_device_login_initiation_code1'))
 	)
-	op.execute(device_login_initiation_table.update().values(oauth2_client_db_id=sa.select([oauth2client_table.c.db_id]).where(device_login_initiation_table.c.oauth2_client_id==oauth2client_table.c.client_id).as_scalar()))
+	op.execute(device_login_initiation_table.update().values(oauth2_client_db_id=sa.select(oauth2client_table.c.db_id).where(device_login_initiation_table.c.oauth2_client_id==oauth2client_table.c.client_id).as_scalar()))
 	op.execute(device_login_initiation_table.delete().where(device_login_initiation_table.c.oauth2_client_db_id==None))
 	with op.batch_alter_table('device_login_initiation', copy_from=device_login_initiation_table) as batch_op:
 		batch_op.drop_column('oauth2_client_id')
@@ -198,7 +198,7 @@ def upgrade():
 		sa.PrimaryKeyConstraint('id', name=op.f('pk_oauth2grant')),
 		sa.Index('ix_oauth2grant_code', 'code')
 	)
-	op.execute(oauth2grant_table.update().values(client_db_id=sa.select([oauth2client_table.c.db_id]).where(oauth2grant_table.c.client_id==oauth2client_table.c.client_id).as_scalar()))
+	op.execute(oauth2grant_table.update().values(client_db_id=sa.select(oauth2client_table.c.db_id).where(oauth2grant_table.c.client_id==oauth2client_table.c.client_id).as_scalar()))
 	op.execute(oauth2grant_table.delete().where(oauth2grant_table.c.client_db_id==None))
 	with op.batch_alter_table('oauth2grant', copy_from=oauth2grant_table) as batch_op:
 		batch_op.alter_column('client_db_id', existing_type=sa.Integer(), nullable=False)
@@ -223,14 +223,14 @@ def upgrade():
 		sa.UniqueConstraint('access_token', name=op.f('uq_oauth2token_access_token')),
 		sa.UniqueConstraint('refresh_token', name=op.f('uq_oauth2token_refresh_token'))
 	)
-	op.execute(oauth2token_table.update().values(client_db_id=sa.select([oauth2client_table.c.db_id]).where(oauth2token_table.c.client_id==oauth2client_table.c.client_id).as_scalar()))
+	op.execute(oauth2token_table.update().values(client_db_id=sa.select(oauth2client_table.c.db_id).where(oauth2token_table.c.client_id==oauth2client_table.c.client_id).as_scalar()))
 	op.execute(oauth2token_table.delete().where(oauth2token_table.c.client_db_id==None))
 	with op.batch_alter_table('oauth2token', copy_from=oauth2token_table) as batch_op:
 		batch_op.alter_column('client_db_id', existing_type=sa.Integer(), nullable=False)
 		batch_op.drop_column('client_id')
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	oauth2client_table = sa.Table('oauth2client', meta,
 		sa.Column('db_id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('service_id', sa.Integer(), nullable=False),
@@ -259,7 +259,7 @@ def downgrade():
 		sa.UniqueConstraint('access_token', name=op.f('uq_oauth2token_access_token')),
 		sa.UniqueConstraint('refresh_token', name=op.f('uq_oauth2token_refresh_token'))
 	)
-	op.execute(oauth2token_table.update().values(client_id=sa.select([oauth2client_table.c.client_id]).where(oauth2token_table.c.client_db_id==oauth2client_table.c.db_id).as_scalar()))
+	op.execute(oauth2token_table.update().values(client_id=sa.select(oauth2client_table.c.client_id).where(oauth2token_table.c.client_db_id==oauth2client_table.c.db_id).as_scalar()))
 	op.execute(oauth2token_table.delete().where(oauth2token_table.c.client_id==None))
 	with op.batch_alter_table('oauth2token', copy_from=oauth2token_table) as batch_op:
 		batch_op.alter_column('client_id', existing_type=sa.VARCHAR(length=40), nullable=False)
@@ -282,7 +282,7 @@ def downgrade():
 		sa.PrimaryKeyConstraint('id', name=op.f('pk_oauth2grant')),
 		sa.Index('ix_oauth2grant_code', 'code')
 	)
-	op.execute(oauth2grant_table.update().values(client_id=sa.select([oauth2client_table.c.client_id]).where(oauth2grant_table.c.client_db_id==oauth2client_table.c.db_id).as_scalar()))
+	op.execute(oauth2grant_table.update().values(client_id=sa.select(oauth2client_table.c.client_id).where(oauth2grant_table.c.client_db_id==oauth2client_table.c.db_id).as_scalar()))
 	op.execute(oauth2grant_table.delete().where(oauth2grant_table.c.client_id==None))
 	with op.batch_alter_table('oauth2grant', copy_from=oauth2grant_table) as batch_op:
 		batch_op.alter_column('client_id', existing_type=sa.VARCHAR(length=40), nullable=False)
@@ -305,7 +305,7 @@ def downgrade():
 		sa.UniqueConstraint('code0', name=op.f('uq_device_login_initiation_code0')),
 		sa.UniqueConstraint('code1', name=op.f('uq_device_login_initiation_code1'))
 	)
-	op.execute(device_login_initiation_table.update().values(oauth2_client_id=sa.select([oauth2client_table.c.client_id]).where(device_login_initiation_table.c.oauth2_client_db_id==oauth2client_table.c.db_id).as_scalar()))
+	op.execute(device_login_initiation_table.update().values(oauth2_client_id=sa.select(oauth2client_table.c.client_id).where(device_login_initiation_table.c.oauth2_client_db_id==oauth2client_table.c.db_id).as_scalar()))
 	op.execute(device_login_initiation_table.delete().where(device_login_initiation_table.c.oauth2_client_id==None))
 	with op.batch_alter_table('device_login_initiation', copy_from=device_login_initiation_table) as batch_op:
 		batch_op.drop_constraint(batch_op.f('fk_device_login_initiation_oauth2_client_db_id_oauth2client'), type_='foreignkey')

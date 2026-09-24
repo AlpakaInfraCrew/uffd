@@ -14,7 +14,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 
 	oauth2grant = sa.Table('oauth2grant', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -55,7 +55,7 @@ def upgrade():
 		batch_op.alter_column('claims', existing_type=sa.TEXT(), nullable=False)
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 
 	oauth2grant = sa.Table('oauth2grant', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),

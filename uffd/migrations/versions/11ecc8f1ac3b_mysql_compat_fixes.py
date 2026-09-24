@@ -14,7 +14,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	table = sa.Table('device_login_confirmation', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('initiation_id', sa.Integer(), nullable=False),
@@ -32,7 +32,7 @@ def upgrade():
 	)
 	with op.batch_alter_table(table.name, copy_from=table, recreate='always') as batch_op:
 		pass
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	# Previously "fk_device_login_confirmation_initiation_id_" was named
 	# "fk_device_login_confirmation_initiation_id_device_login_initiation"
 	# but this was too long for MySQL.

@@ -22,7 +22,7 @@ def upgrade():
 		sa.column('remailer_mode', sa.Enum('DISABLED', 'ENABLED_V1', 'ENABLED_V2', create_constraint=True, name='remailermode')),
 	)
 	op.execute(service.update().values(remailer_mode='ENABLED_V1').where(service.c.use_remailer))
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	service = sa.Table('service', meta,
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
@@ -48,7 +48,7 @@ def downgrade():
 		sa.column('remailer_mode', sa.Enum('DISABLED', 'ENABLED_V1', 'ENABLED_V2', create_constraint=True, name='remailermode')),
 	)
 	op.execute(service.update().values(use_remailer=sa.true()).where(service.c.remailer_mode != 'DISABLED'))
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	service = sa.Table('service', meta,
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),

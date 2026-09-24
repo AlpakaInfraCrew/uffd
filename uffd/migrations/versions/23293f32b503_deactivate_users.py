@@ -14,7 +14,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	with op.batch_alter_table('service', schema=None) as batch_op:
 		batch_op.add_column(sa.Column('hide_deactivated_users', sa.Boolean(create_constraint=True), nullable=False, server_default=sa.false()))
 	service = sa.Table('service', meta,
@@ -54,7 +54,7 @@ def upgrade():
 		batch_op.alter_column('is_deactivated', server_default=None)
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	user = sa.Table('user', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('unix_uid', sa.Integer(), nullable=False),

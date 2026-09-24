@@ -13,13 +13,13 @@ class TestFeatureFlag(ModelTestCase):
 	def test_disabled(self):
 		flag = FeatureFlag('foo')
 		self.assertFalse(flag)
-		self.assertFalse(db.session.execute(db.select([flag.expr])).scalar())
+		self.assertFalse(db.session.execute(db.select(flag.expr)).scalar())
 
 	def test_enabled(self):
 		db.session.execute(db.insert(feature_flag_table).values(name='foo'))
 		flag = FeatureFlag('foo')
 		self.assertTrue(flag)
-		self.assertTrue(db.session.execute(db.select([flag.expr])).scalar())
+		self.assertTrue(db.session.execute(db.select(flag.expr)).scalar())
 
 	def test_toggle(self):
 		flag = FeatureFlag('foo')

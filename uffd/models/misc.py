@@ -18,7 +18,7 @@ class FeatureFlag:
 		return db.exists().where(feature_flag_table.c.name == self.name)
 
 	def __bool__(self):
-		return db.session.execute(db.select([self.expr])).scalar()
+		return db.session.execute(db.select(self.expr)).scalar()
 
 	def enable_hook(self, func):
 		self.enable_hooks.append(func)
@@ -61,7 +61,7 @@ class Lock:
 			# with any write operation. So we do a dummy update.
 			db.session.execute(db.update(lock_table).where(False).values(name=None))
 		elif db.engine.name in ('mysql', 'mariadb'):
-			result = db.session.execute(db.select([lock_table.c.name]).where(lock_table.c.name == self.name).with_for_update()).scalar()
+			result = db.session.execute(db.select(lock_table.c.name).where(lock_table.c.name == self.name).with_for_update()).scalar()
 			if result is not None:
 				return
 			# We add all lock rows with migrations so we should never end up here

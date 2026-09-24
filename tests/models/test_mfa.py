@@ -50,6 +50,7 @@ class TestMfaMethodModels(UffdTestCase):
 
 	def test_totp_method_attributes(self):
 		method = TOTPMethod(user=self.get_user(), name='testname')
+		db.session.add(method)
 		raw_key = method.raw_key
 		issuer = method.issuer
 		accountname = method.accountname
@@ -57,6 +58,7 @@ class TestMfaMethodModels(UffdTestCase):
 		self.assertEqual(method.name, 'testname')
 		# Restore method with key parameter
 		_method = TOTPMethod(user=self.get_user(), key=method.key, name='testname')
+		db.session.add(_method)
 		self.assertEqual(_method.name, 'testname')
 		self.assertEqual(_method.raw_key, raw_key)
 		self.assertEqual(_method.issuer, issuer)

@@ -14,7 +14,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	mfa_method = sa.Table('mfa_method', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('type', sa.Enum('RECOVERY_CODE', 'TOTP', 'WEBAUTHN', name='mfatype', create_constraint=True), nullable=False),
@@ -35,7 +35,7 @@ def upgrade():
 	op.execute(mfa_method.update().values(recovery_hash=('{crypt}' + mfa_method.c.recovery_hash)).where(mfa_method.c.type == 'RECOVERY_CODE'))
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	mfa_method = sa.Table('mfa_method', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('type', sa.Enum('RECOVERY_CODE', 'TOTP', 'WEBAUTHN', name='mfatype', create_constraint=True), nullable=False),

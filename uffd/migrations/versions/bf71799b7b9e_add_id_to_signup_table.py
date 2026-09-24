@@ -14,7 +14,7 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	invite_signup = sa.Table('invite_signup', meta,
 		sa.Column('token', sa.String(length=128), nullable=False),
 		sa.Column('invite_id', sa.Integer(), nullable=False),
@@ -26,7 +26,7 @@ def upgrade():
 		batch_op.add_column(sa.Column('id', sa.Integer(), nullable=True))
 		batch_op.drop_constraint('fk_invite_signup_token_signup', 'foreignkey')
 
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	signup = sa.Table('signup', meta,
 		sa.Column('token', sa.String(length=128), nullable=False),
 		sa.Column('created', sa.DateTime(), nullable=False),
@@ -44,7 +44,7 @@ def upgrade():
 		batch_op.create_primary_key('pk_signup', ['id'])
 		batch_op.alter_column('id', autoincrement=True, nullable=False, existing_type=sa.Integer())
 
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	signup = sa.Table('signup', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('token', sa.String(length=128), nullable=False),
@@ -64,7 +64,7 @@ def upgrade():
 		sa.ForeignKeyConstraint(['invite_id'], ['invite.id'], name=op.f('fk_invite_signup_invite_id_invite')),
 		sa.PrimaryKeyConstraint('token', name=op.f('pk_invite_signup'))
 	)
-	op.execute(invite_signup.update().values(id=sa.select([signup.c.id]).where(signup.c.token==invite_signup.c.token).limit(1).as_scalar()))
+	op.execute(invite_signup.update().values(id=sa.select(signup.c.id).where(signup.c.token==invite_signup.c.token).limit(1).as_scalar()))
 	with op.batch_alter_table(invite_signup.name, copy_from=invite_signup) as batch_op:
 		batch_op.alter_column('id', nullable=False, existing_type=sa.Integer())
 		batch_op.create_foreign_key(batch_op.f('fk_invite_signup_id_signup'), 'signup', ['id'], ['id'])
@@ -73,7 +73,7 @@ def upgrade():
 		batch_op.create_primary_key('pk_invite_signup', ['id'])
 
 def downgrade():
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	invite_signup = sa.Table('invite_signup', meta,
 		sa.Column('id', sa.Integer(), nullable=False),
 		sa.Column('invite_id', sa.Integer(), nullable=False),
@@ -85,7 +85,7 @@ def downgrade():
 		batch_op.add_column(sa.Column('token', sa.VARCHAR(length=128), nullable=True))
 		batch_op.drop_constraint('fk_invite_signup_id_signup', type_='foreignkey')
 
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	signup = sa.Table('signup', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('token', sa.String(length=128), nullable=False),
@@ -103,7 +103,7 @@ def downgrade():
 		batch_op.drop_constraint('pk_signup', 'primary')
 		batch_op.create_primary_key('pk_signup', ['token'])
 
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	signup = sa.Table('signup', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('token', sa.String(length=128), nullable=False),
@@ -124,14 +124,14 @@ def downgrade():
 		sa.ForeignKeyConstraint(['id'], ['signup.id'], name=op.f('fk_invite_signup_id_signup')),
 		sa.PrimaryKeyConstraint('id', name=op.f('pk_invite_signup'))
 	)
-	op.execute(invite_signup.update().values(token=sa.select([signup.c.token]).where(signup.c.id==invite_signup.c.id).limit(1).as_scalar()))
+	op.execute(invite_signup.update().values(token=sa.select(signup.c.token).where(signup.c.id==invite_signup.c.id).limit(1).as_scalar()))
 	with op.batch_alter_table(invite_signup.name, copy_from=invite_signup) as batch_op:
 		batch_op.create_foreign_key(batch_op.f('fk_invite_signup_token_signup'), 'signup', ['token'], ['token'])
 		batch_op.drop_constraint('pk_invite_signup', 'primary')
 		batch_op.drop_column('id')
 		batch_op.create_primary_key('pk_invite_signup', ['token'])
 
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	signup = sa.Table('signup', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('token', sa.String(length=128), nullable=False),

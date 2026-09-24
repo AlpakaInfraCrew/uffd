@@ -117,6 +117,7 @@ def add_email():
 	if not email.set_address(request.form['address']):
 		flash(_('E-Mail address is invalid'))
 		return redirect(url_for('selfservice.index'))
+	db.session.add(email)
 	try:
 		db.session.flush()
 	except IntegrityError:
@@ -124,7 +125,6 @@ def add_email():
 		return redirect(url_for('selfservice.index'))
 
 	secret = email.start_verification()
-	db.session.add(email)
 	db.session.commit()
 	if not sendmail(email.address, 'Mail verification', 'selfservice/mailverification.mail.txt', user=request.user, email=email, secret=secret):
 		flash(_('E-Mail to "%(mail_address)s" could not be sent!', mail_address=email.address))

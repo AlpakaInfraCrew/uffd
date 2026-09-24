@@ -50,14 +50,14 @@ def upgrade():
 	)
 	op.execute(user_email_table.insert().from_select(
 		['user_id', 'address', 'verified'],
-		sa.select([user_table.c.id, user_table.c.mail, sa.literal(True, sa.Boolean(create_constraint=True))])
+		sa.select(user_table.c.id, user_table.c.mail, sa.literal(True, sa.Boolean(create_constraint=True)))
 	))
 	with op.batch_alter_table('user', schema=None) as batch_op:
 		batch_op.add_column(sa.Column('primary_email_id', sa.Integer(), nullable=True))
 		batch_op.add_column(sa.Column('recovery_email_id', sa.Integer(), nullable=True))
 		batch_op.create_foreign_key(batch_op.f('fk_user_primary_email_id_user_email'), 'user_email', ['primary_email_id'], ['id'], onupdate='CASCADE')
 		batch_op.create_foreign_key(batch_op.f('fk_user_recovery_email_id_user_email'), 'user_email', ['recovery_email_id'], ['id'], onupdate='CASCADE', ondelete='SET NULL')
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	user_table = sa.Table('user', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('unix_uid', sa.Integer(), nullable=False),
@@ -74,7 +74,7 @@ def upgrade():
 		sa.UniqueConstraint('loginname', name=op.f('uq_user_loginname')),
 		sa.UniqueConstraint('unix_uid', name=op.f('uq_user_unix_uid'))
 	)
-	op.execute(user_table.update().values(primary_email_id=sa.select([user_email_table.c.id]).where(user_email_table.c.user_id==user_table.c.id).limit(1).as_scalar()))
+	op.execute(user_table.update().values(primary_email_id=sa.select(user_email_table.c.id).where(user_email_table.c.user_id==user_table.c.id).limit(1).as_scalar()))
 	with op.batch_alter_table('user', copy_from=user_table) as batch_op:
 		batch_op.alter_column('primary_email_id', existing_type=sa.Integer(), nullable=False)
 		batch_op.drop_column('mail')
@@ -100,7 +100,7 @@ def upgrade():
 def downgrade():
 	with op.batch_alter_table('user', schema=None) as batch_op:
 		batch_op.add_column(sa.Column('mail', sa.VARCHAR(length=128), nullable=True))
-	meta = sa.MetaData(bind=op.get_bind())
+	meta = sa.MetaData()
 	user_table = sa.Table('user', meta,
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('unix_uid', sa.Integer(), nullable=False),
@@ -121,7 +121,7 @@ def downgrade():
 		sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
 		sa.Column('address', sa.String(length=128), nullable=False),
 	)
-	op.execute(user_table.update().values(mail=sa.select([user_email_table.c.address]).where(user_email_table.c.id==user_table.c.primary_email_id).limit(1).as_scalar()))
+	op.execute(user_table.update().values(mail=sa.select(user_email_table.c.address).where(user_email_table.c.id==user_table.c.primary_email_id).limit(1).as_scalar()))
 	with op.batch_alter_table('user', copy_from=user_table) as batch_op:
 		batch_op.alter_column('mail', existing_type=sa.VARCHAR(length=128), nullable=False)
 		batch_op.drop_constraint(batch_op.f('fk_user_recovery_email_id_user_email'), type_='foreignkey')

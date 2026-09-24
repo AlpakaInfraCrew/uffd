@@ -47,7 +47,7 @@ class TestMigration(MigrationTestCase):
 			verified=True
 		))
 		email_id = db.session.execute(
-			db.select([user_email_table.c.id])
+			db.select(user_email_table.c.id)
 			.where(user_email_table.c.address == f'email{uid}@example.com')
 		).scalar()
 		db.session.execute(db.insert(user_table).values(
@@ -63,13 +63,13 @@ class TestMigration(MigrationTestCase):
 
 	def fetch_uid_allocations(self):
 		return [row[0] for row in db.session.execute(
-			db.select([uid_allocation_table])
+			db.select(uid_allocation_table)
 			.order_by(uid_allocation_table.c.id)
 		).fetchall()]
 
 	def fetch_gid_allocations(self):
 		return [row[0] for row in db.session.execute(
-			db.select([gid_allocation_table])
+			db.select(gid_allocation_table)
 			.order_by(gid_allocation_table.c.id)
 		).fetchall()]
 
