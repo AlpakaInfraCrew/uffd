@@ -28,45 +28,40 @@ setup(
 	packages=['uffd'],
 	include_package_data=True,
 	zip_safe=False,
-	python_requires='>=3.7',
+	python_requires='>=3.11',
 	install_requires=[
-		# Versions Debian Buster packages are based on.
+		# Versions Debian Bookworm packages are based on.
 		# DO NOT USE FOR PRODUCTION, those in the setup.py are not updated regularly
-		'flask==1.0.2',
-		'Flask-SQLAlchemy==2.1',
-		'qrcode==6.1',
-		'fido2==0.5.0',
-		'cryptography==2.6.1',
-		'pyjwt==1.7.0',
-		'Flask-Migrate==2.1.1',
-		'Flask-Babel==0.11.2',
-		'alembic==1.0.0',
-		'argon2-cffi==18.3.0',
-		'itsdangerous==0.24',
-		'prometheus-client==0.9',
-		'ua-parser==0.8.0',
+		'flask==2.2.2',
+		'Flask-SQLAlchemy==3.0.3',
+		'qrcode==7.4.2',
+		'fido2==0.9.1',
+		'cryptography==38.0.4',
+		'pyjwt==2.6.0',
+		'Flask-Migrate==4.0.4',
+		'Flask-Babel==2.0.0',
+		'argon2-cffi==21.1.0',
+		'itsdangerous==2.1.2',
+		'prometheus-client==0.16.0',
+		'ua-parser==0.16.1',
 
 		# The main dependencies on their own lead to version collisions and pip is
-		# not very good at resolving them, so we pin the versions from Debian Buster
+		# not very good at resolving them, so we pin the versions from Debian Bookworm
 		# for all dependencies.
-		'certifi==2018.8.24',
-		#cffi==1.12.2'
-		'cffi # v1.12.2 no longer works with python3.9. Newer versions seem to work fine.',
-		'chardet==3.0.4',
-		'click==7.0',
-		'idna==2.6',
-		'Jinja2==2.10',
-		'MarkupSafe==1.1.0',
-		'pyasn1==0.4.2',
-		'pycparser==2.19',
-		'requests==2.21.0',
-		'requests-oauthlib==1.0.0',
+		'alembic==1.9.0', # Bookworm ships 1.8.1, but flask-migrate 4.0.4 depends on alembic>=1.9.0
+		'cffi',
+		'click==8.1.3',
+		'Jinja2==3.1.2',
+		'MarkupSafe==2.1.2',
+		'pycparser==2.21',
 		'six==1.12.0',
-		'SQLAlchemy==1.2.18',
-		'urllib3==1.24.1',
-		'Werkzeug==0.14.1',
-		'python-dateutil==2.7.3',
-		#editor==1.0.3
-		'Mako==1.0.7',
+		'SQLAlchemy==1.4.46',
+		'Werkzeug==2.2.2',
+		'Mako==1.2.4',
+		'Babel==2.10.3',
+		'pytz==2022.7.1',
+		'typing-extensions==4.4.0',
+		'pypng==0.20220715.0',
+		'greenlet==3.1.0', # Bookworm ships 2.0.2, but this does not build on Trixie
 	],
 )
