@@ -47,34 +47,6 @@ db_migrations_updated:
   - FLASK_APP=uffd FLASK_ENV=testing flask db upgrade
   - FLASK_APP=uffd FLASK_ENV=testing flask db migrate 2>&1 | grep -q 'No changes in schema detected'
 
-linter:buster:
-  image: registry.git.cccv.de/uffd/docker-images/buster
-  stage: test
-  needs: []
-  script:
-  - pip3 install $PYLINT_PIN pylint-gitlab pylint-flask-sqlalchemy # this force-updates jinja2 and some other packages!
-  - python3 -m pylint --output-format=pylint_gitlab.GitlabCodeClimateReporter:codeclimate.json,pylint_gitlab.GitlabPagesHtmlReporter:pylint.html,colorized uffd
-  artifacts:
-    when: always
-    paths:
-    - pylint.html
-    reports:
-      codequality: codeclimate.json
-
-linter:bullseye:
-  image: registry.git.cccv.de/uffd/docker-images/bullseye
-  stage: test
-  needs: []
-  script:
-  - pip3 install $PYLINT_PIN pylint-gitlab pylint-flask-sqlalchemy # this force-updates jinja2 and some other packages!
-  - python3 -m pylint --output-format=pylint_gitlab.GitlabCodeClimateReporter:codeclimate.json,pylint_gitlab.GitlabPagesHtmlReporter:pylint.html,colorized uffd
-  artifacts:
-    when: always
-    paths:
-    - pylint.html
-    reports:
-      codequality: codeclimate.json
-
 linter:bookworm:
   image: registry.git.cccv.de/uffd/docker-images/bookworm
   stage: test
@@ -88,52 +60,6 @@ linter:bookworm:
     - pylint.html
     reports:
       codequality: codeclimate.json
-
-tests:buster:sqlite:
-  image: registry.git.cccv.de/uffd/docker-images/buster
-  stage: test
-  needs: []
-  script:
-  - python3 -m pytest --junitxml=report.xml
-  artifacts:
-    when: always
-    reports:
-      junit: report.xml
-
-tests:buster:mysql:
-  image: registry.git.cccv.de/uffd/docker-images/buster
-  stage: test
-  needs: []
-  script:
-  - service mysql start
-  - TEST_WITH_MYSQL=1 python3 -m pytest --junitxml=report.xml
-  artifacts:
-    when: always
-    reports:
-      junit: report.xml
-
-tests:bullseye:sqlite:
-  image: registry.git.cccv.de/uffd/docker-images/bullseye
-  stage: test
-  needs: []
-  script:
-  - python3 -m pytest --junitxml=report.xml
-  artifacts:
-    when: always
-    reports:
-      junit: report.xml
-
-tests:bullseye:mysql:
-  image: registry.git.cccv.de/uffd/docker-images/bullseye
-  stage: test
-  needs: []
-  script:
-  - service mariadb start
-  - TEST_WITH_MYSQL=1 python3 -m pytest --junitxml=report.xml
-  artifacts:
-    when: always
-    reports:
-      junit: report.xml
 
 tests:bookworm:sqlite:
   image: registry.git.cccv.de/uffd/docker-images/bookworm
@@ -198,22 +124,6 @@ trans_de:
   variables:
     TRANSLATION_LANGUAGE: de
 
-test:package:pip:buster:
-  image: registry.git.cccv.de/uffd/docker-images/buster
-  stage: test
-  needs:
-  - job: build:pip
-  script:
-  - pip3 install dist/*.tar.gz
-
-test:package:pip:bullseye:
-  image: registry.git.cccv.de/uffd/docker-images/bullseye
-  stage: test
-  needs:
-  - job: build:pip
-  script:
-  - pip3 install dist/*.tar.gz
-
 test:package:pip:bookworm:
   image: registry.git.cccv.de/uffd/docker-images/bookworm
   stage: test
@@ -262,8 +172,6 @@ publish:apt:
   - curl --user "${APTLY_API_USER}:${APTLY_API_PW}" -X POST "${APT_API_URL}/api/repos/${APT_REPO}/file/${APT_REPO}-ci-upload-${CI_JOB_ID}"
   - curl --user "${APTLY_API_USER}:${APTLY_API_PW}" -X DELETE "${APT_API_URL}/api/files/${APT_REPO}-ci-upload-${CI_JOB_ID}"
   - echo Update published repo for all distros
-  - 'curl --user "${APTLY_API_USER}:${APTLY_API_PW}" -X PUT -H "Content-Type: application/json" --data "{ }" "${APT_API_URL}/api/publish/uffd/buster"'
-  - 'curl --user "${APTLY_API_USER}:${APTLY_API_PW}" -X PUT -H "Content-Type: application/json" --data "{ }" "${APT_API_URL}/api/publish/uffd/bullseye"'
   - 'curl --user "${APTLY_API_USER}:${APTLY_API_PW}" -X PUT -H "Content-Type: application/json" --data "{ }" "${APT_API_URL}/api/publish/uffd/bookworm"'
   dependencies:
   - build:apt
