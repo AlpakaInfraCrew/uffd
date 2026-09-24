@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer, Text, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.collections import MappedCollection, collection
+from sqlalchemy.orm.collections import MappedCollection # pylint: disable=no-name-in-module
+from sqlalchemy.orm.collections import collection
 
 from uffd.database import db
 from .user import User

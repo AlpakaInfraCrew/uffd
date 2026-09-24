@@ -5,7 +5,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: normal
   APT_API_URL: https://packages.cccv.de
   APT_REPO: uffd
-  PYLINT_PIN: pylint~=2.16.2
+  PYLINT_PIN: pylint~=3.3.4
 
 before_script:
   - python3 -V
@@ -52,7 +52,7 @@ linter:bookworm:
   stage: test
   needs: []
   script:
-  - pip3 install $PYLINT_PIN pylint-gitlab pylint-flask-sqlalchemy # this force-updates jinja2 and some other packages!
+  - pip3 install $PYLINT_PIN pylint-gitlab # this force-updates jinja2 and some other packages!
   - python3 -m pylint --output-format=pylint_gitlab.GitlabCodeClimateReporter:codeclimate.json,pylint_gitlab.GitlabPagesHtmlReporter:pylint.html,colorized uffd
   artifacts:
     when: always
@@ -61,19 +61,19 @@ linter:bookworm:
     reports:
       codequality: codeclimate.json
 
-#linter:trixie:
-#  image: registry.git.cccv.de/uffd/docker-images/trixie
-#  stage: test
-#  needs: []
-#  script:
-#  - pip3 install $PYLINT_PIN pylint-gitlab pylint-flask-sqlalchemy # this force-updates jinja2 and some other packages!
-#  - python3 -m pylint --output-format=pylint_gitlab.GitlabCodeClimateReporter:codeclimate.json,pylint_gitlab.GitlabPagesHtmlReporter:pylint.html,colorized uffd
-#  artifacts:
-#    when: always
-#    paths:
-#    - pylint.html
-#    reports:
-#      codequality: codeclimate.json
+linter:trixie:
+  image: registry.git.cccv.de/uffd/docker-images/trixie
+  stage: test
+  needs: []
+  script:
+  - pip3 install $PYLINT_PIN pylint-gitlab # this force-updates jinja2 and some other packages!
+  - python3 -m pylint --output-format=pylint_gitlab.GitlabCodeClimateReporter:codeclimate.json,pylint_gitlab.GitlabPagesHtmlReporter:pylint.html,colorized uffd
+  artifacts:
+    when: always
+    paths:
+    - pylint.html
+    reports:
+      codequality: codeclimate.json
 
 tests:bookworm:sqlite:
   image: registry.git.cccv.de/uffd/docker-images/bookworm

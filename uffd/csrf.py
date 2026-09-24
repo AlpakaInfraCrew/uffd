@@ -8,7 +8,8 @@ csrf_endpoints = []
 
 def csrf_protect(blueprint=None, endpoint=None):
 	def wraper(func):
-		if not endpoint:
+		urlendpoint = endpoint
+		if not urlendpoint:
 			if blueprint:
 				urlendpoint = "{}.{}".format(blueprint.name, func.__name__)
 			else:
