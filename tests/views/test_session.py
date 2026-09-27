@@ -224,8 +224,7 @@ class TestMfaViews(UffdTestCase):
 	def test_auth_disabled(self):
 		self.assertIsNone(request.user)
 		r = self.login_as('user', ref='/redirecttarget')
-		if hasattr(r, 'request'): # Not available in Buster/Bullseye
-			self.assertTrue(r.request.base_url.endswith('/redirecttarget'))
+		self.assertTrue(r.request.base_url.endswith('/redirecttarget'))
 		self.assertIsNotNone(request.user)
 		self.assertEqual(request.user.loginname, 'testuser')
 
@@ -233,8 +232,7 @@ class TestMfaViews(UffdTestCase):
 		self.add_recovery_codes()
 		self.assertIsNone(request.user)
 		r = self.login_as('user', ref='/redirecttarget')
-		if hasattr(r, 'request'): # Not available in Buster/Bullseye
-			self.assertTrue(r.request.base_url.endswith('/redirecttarget'))
+		self.assertTrue(r.request.base_url.endswith('/redirecttarget'))
 		self.assertIsNotNone(request.user)
 
 	def test_auth_recovery_code(self):

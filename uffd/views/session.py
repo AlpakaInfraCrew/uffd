@@ -95,8 +95,6 @@ class LoginState:
 		user = User.query.get(data['user_id'])
 		if user is None:
 			return None
-		# Compatibility with itsdangerous<2.0.0 (Buster/Bullseye)
-		timestamp = timestamp.replace(tzinfo=datetime.timezone.utc)
 		age = datetime.datetime.now(tz=datetime.timezone.utc) - timestamp
 		timeout = max(0, current_app.config['MFA_AUTH_TIMEOUT_SECONDS'] - age.total_seconds())
 		return cls(user, value=value, timeout=timeout)
@@ -220,7 +218,7 @@ if WEBAUTHN_SUPPORTED:
 		creds = [method.cred for method in login_state.user.mfa_webauthn_methods]
 		if not creds:
 			abort(404)
-		# authenticate_complete() (as of python-fido2 v0.5.0, the version in Debian Buster)
+		# authenticate_complete() (as of python-fido2 v1.2.0, the version in Debian Trixie)
 		# does not check signCount, although the spec recommends it
 		server = get_webauthn_server()
 		server.authenticate_complete(

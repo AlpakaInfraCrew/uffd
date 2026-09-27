@@ -3,10 +3,7 @@ import os
 from flask import current_app
 from flask.cli import with_appcontext
 import click
-try:
-	from werkzeug.middleware.profiler import ProfilerMiddleware
-except ImportError:
-	from werkzeug.contrib.profiler import ProfilerMiddleware
+from werkzeug.middleware.profiler import ProfilerMiddleware
 
 @click.command("profile", help='Runs app with profiler')
 @with_appcontext

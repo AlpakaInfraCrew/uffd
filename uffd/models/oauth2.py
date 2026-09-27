@@ -16,10 +16,6 @@ from uffd.utils import token_urlfriendly
 from .session import DeviceLoginInitiation, DeviceLoginType
 from .service import ServiceUser
 
-# pyjwt v1.7.x compat (Buster/Bullseye)
-if not hasattr(jwt, 'get_algorithm_by_name'):
-	jwt.get_algorithm_by_name = lambda name: jwt.algorithms.get_default_algorithms()[name]
-
 class OAuth2Client(db.Model):
 	__tablename__ = 'oauth2client'
 	# Inconsistently named "db_id" instead of "id" because of the naming conflict
@@ -245,19 +241,14 @@ class OAuth2Key(db.Model):
 	def encode_jwt(self, payload):
 		if not self.active:
 			raise jwt.exceptions.InvalidKeyError(f'Key {self.id} not active')
-		res = jwt.encode(payload, key=self.private_key, algorithm=self.algorithm, headers={'kid': self.id})
-		# pyjwt pre-v2 compat (Buster/Bullseye)
-		if isinstance(res, bytes):
-			res = res.decode()
-		return res
+		return jwt.encode(payload, key=self.private_key, algorithm=self.algorithm, headers={'kid': self.id})
 
 	# Hash algorithm for at_hash/c_hash from OpenID Connect Core 1.0 section 3.1.3.6
 	def oidc_hash(self, value):
 		# pylint: disable=import-outside-toplevel
 		from cryptography.hazmat.primitives import hashes
-		from cryptography.hazmat.backends import default_backend # Only required for Buster
 		hash_alg = jwt.get_algorithm_by_name(self.algorithm).hash_alg
-		digest = hashes.Hash(hash_alg(), backend=default_backend())
+		digest = hashes.Hash(hash_alg())
 		digest.update(value)
 		return base64.urlsafe_b64encode(
 			digest.finalize()[:hash_alg.digest_size // 2]
@@ -288,5 +279,4 @@ class OAuth2Key(db.Model):
 	def generate_rsa_key(cls, public_exponent=65537, key_size=3072):
 		# pylint: disable=import-outside-toplevel
 		from cryptography.hazmat.primitives.asymmetric import rsa
-		from cryptography.hazmat.backends import default_backend # Only required for Buster
-		return cls(algorithm='RS256', private_key=rsa.generate_private_key(public_exponent=public_exponent, key_size=key_size, backend=default_backend()))
+		return cls(algorithm='RS256', private_key=rsa.generate_private_key(public_exponent=public_exponent, key_size=key_size))

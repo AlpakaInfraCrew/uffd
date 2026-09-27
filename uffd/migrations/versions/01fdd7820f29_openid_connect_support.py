@@ -14,12 +14,7 @@ import math
 import logging
 
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend # Only required for Buster
 import jwt
-
-# pyjwt v1.7.x compat (Buster/Bullseye)
-if not hasattr(jwt, 'get_algorithm_by_name'):
-	jwt.get_algorithm_by_name = lambda name: jwt.algorithms.get_default_algorithms()[name]
 
 # revision identifiers, used by Alembic.
 revision = '01fdd7820f29'
@@ -44,7 +39,7 @@ def token_urlfriendly(nbytes=None):
 
 def upgrade():
 	logger.info('Generating 3072 bit RSA key pair (RS256) for OpenID Connect support ...')
-	private_key = rsa.generate_private_key(public_exponent=65537, key_size=3072, backend=default_backend())
+	private_key = rsa.generate_private_key(public_exponent=65537, key_size=3072)
 
 	meta = sa.MetaData()
 	oauth2_key = op.create_table('oauth2_key',
