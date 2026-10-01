@@ -51,7 +51,7 @@ OIDC_SCOPES = {
 }
 
 OIDC_CLAIMS = {
-	'sub': lambda tok: str(tok.session.user.unix_uid),
+	'sub': lambda tok: str(tok.session.user.unix_uid) if not tok.client.use_uuid_as_sub else str(tok.session.user.uuid),
 	'name': lambda tok: tok.session.user.displayname,
 	'preferred_username': lambda tok: tok.session.user.loginname,
 	'email': lambda tok: tok.service_user.email,
@@ -334,7 +334,10 @@ def authorize():
 
 	try:
 		_session = authorize_user(grant.client)
-		if sub_value is not None and str(_session.user.unix_uid) != sub_value:
+		# Note that we compare UUID sub values case-sensitively (in contrast to the
+		# uuid api parameters), because a sub value is an opaque case-sensitive string.
+		_session_sub_value = str(_session.user.unix_uid) if not grant.client.use_uuid_as_sub else str(_session.user.uuid)
+		if sub_value is not None and _session_sub_value != sub_value:
 			# We only reach this point in OIDC requests with prompt=none, see
 			# authorize_validate_request_oidc. So this LoginRequiredError is
 			# always returned as a redirect back to the client.
@@ -484,6 +487,7 @@ def userinfo():
 		service_user = tok.service_user
 		resp = {
 			'id': service_user.user.unix_uid,
+			'uuid': str(service_user.user.uuid),
 			'name': service_user.user.displayname,
 			'nickname': service_user.user.loginname,
 			'email': service_user.email,

@@ -37,6 +37,7 @@ def apikey_required(permission=None):
 def generate_group_dict(group):
 	return {
 		'id': group.unix_gid,
+		'uuid': str(group.uuid),
 		'name': group.name,
 		'members': [
 			user.loginname
@@ -57,6 +58,8 @@ def getgroups():
 		pass
 	elif key == 'id' and len(values) == 1:
 		query = query.filter(Group.unix_gid == values[0])
+	elif key == 'uuid' and len(values) == 1:
+		query = query.filter(Group.uuid == values[0])
 	elif key == 'name' and len(values) == 1:
 		query = query.filter(Group.name == values[0])
 	elif key == 'member' and len(values) == 1:
@@ -73,6 +76,7 @@ def getgroups():
 def generate_user_dict(service_user):
 	return {
 		'id': service_user.user.unix_uid,
+		'uuid': str(service_user.user.uuid),
 		'loginname': service_user.user.loginname,
 		'email': service_user.email,
 		'displayname': service_user.user.displayname,
@@ -93,6 +97,8 @@ def getusers():
 		pass
 	elif key == 'id' and len(values) == 1:
 		query = query.filter(User.unix_uid == values[0])
+	elif key == 'uuid' and len(values) == 1:
+		query = query.filter(User.uuid == values[0])
 	elif key == 'loginname' and len(values) == 1:
 		query = query.filter(User.loginname == values[0])
 	elif key == 'email' and len(values) == 1:

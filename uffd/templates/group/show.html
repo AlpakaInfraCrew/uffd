@@ -17,10 +17,14 @@
 	<div class="form-group col">
 		<label for="group-gid">{{_("Group ID")}}</label>
 		{% if not group.id %}
-		<input type="number" class="form-control" id="group-gid" name="unix_gid" value="" placeholder="Automatically chosen if empty">
+		<input type="number" class="form-control" id="group-gid" name="unix_gid" value="" placeholder="{{ _('automatically chosen if empty') }}">
 		{% else %}
 		<input type="number" class="form-control" id="group-gid" name="unix_gid" value="{{ group.unix_gid }}" readonly>
 		{% endif %}
+	</div>
+	<div class="form-group col">
+		<label for="group-uuid">{{_("UUID")}}</label>
+		<input type="text" class="form-control" id="group-uuid" name="uuid" placeholder="{{ _('automatically chosen') }}" value="{{ group.uuid or '' }}" readonly>
 	</div>
 	<div class="form-group col">
 		<label for="group-loginname">{{_("Name")}}</label>

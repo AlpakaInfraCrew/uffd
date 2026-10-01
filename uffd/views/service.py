@@ -145,6 +145,7 @@ def oauth2_submit(service_id, db_id=None):
 			continue
 		method, uri = line.split(' ', 2)
 		client.logout_uris.append(OAuth2LogoutURI(method=method, uri=uri))
+	client.use_uuid_as_sub = request.form.get('use_uuid_as_sub') == '1'
 	db.session.commit()
 	return redirect(url_for('service.show', id=service.id))
 

@@ -32,6 +32,8 @@ class OAuth2Client(db.Model):
 	redirect_uris = association_proxy('_redirect_uris', 'uri')
 	logout_uris = relationship('OAuth2LogoutURI', cascade='all, delete-orphan')
 
+	use_uuid_as_sub = Column(Boolean(create_constraint=True), default=True, nullable=False)
+
 	@property
 	def default_redirect_uri(self):
 		return self.redirect_uris[0] if len(self.redirect_uris) == 1 else None

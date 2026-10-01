@@ -1,5 +1,7 @@
+import uuid
+
 from sqlalchemy import MetaData, event
-from sqlalchemy.types import TypeDecorator, Text
+from sqlalchemy.types import TypeDecorator, Text, CHAR
 from sqlalchemy.ext.mutable import MutableList
 from flask_sqlalchemy import SQLAlchemy
 
@@ -65,3 +67,21 @@ class CommaSeparatedList(TypeDecorator):
 		if value is None:
 			return None
 		return MutableList(value.split(','))
+
+class Uuid(TypeDecorator):
+	# Identical to Uuid type in SQLAlchemy 2 on SQLite and MariaDB. When we drop Debian Bookworm
+	# support, we  can replace this with the built-in Uuid type (maybe with native_uuid=False).
+	# pylint: disable=abstract-method
+
+	impl = CHAR(32)
+	cache_ok = True
+
+	def process_bind_param(self, value, dialect):
+		if value is None:
+			return None
+		return str(value).lower().replace('-', '')
+
+	def process_result_value(self, value, dialect):
+		if value is None:
+			return None
+		return uuid.UUID(value)

@@ -1,5 +1,6 @@
 import os
 import unittest
+from uuid import UUID
 
 from flask import url_for
 import flask_migrate
@@ -111,15 +112,15 @@ class UffdTestCase(AppTestCase):
 		self.client.get(path='/')
 		db.create_all()
 		# This reflects the old LDAP example data
-		users_group = Group(name='users', unix_gid=20001, description='Base group for all users')
+		users_group = Group(name='users', unix_gid=20001, uuid=UUID('a1111111-1111-1111-1111-111111111111'), description='Base group for all users')
 		db.session.add(users_group)
-		access_group = Group(name='uffd_access', unix_gid=20002, description='Access to Single-Sign-On and Selfservice')
+		access_group = Group(name='uffd_access', unix_gid=20002, uuid=UUID('b2222222-2222-2222-2222-222222222222'), description='Access to Single-Sign-On and Selfservice')
 		db.session.add(access_group)
-		admin_group = Group(name='uffd_admin', unix_gid=20003, description='Admin access to uffd')
+		admin_group = Group(name='uffd_admin', unix_gid=20003, uuid=UUID('c3333333-3333-3333-3333-333333333333'), description='Admin access to uffd')
 		db.session.add(admin_group)
-		testuser = User(loginname='testuser', unix_uid=10000, password='userpassword', primary_email_address='test@example.com', displayname='Test User', groups=[users_group, access_group])
+		testuser = User(loginname='testuser', unix_uid=10000, uuid=UUID('d4444444-4444-4444-4444-444444444444'), password='userpassword', primary_email_address='test@example.com', displayname='Test User', groups=[users_group, access_group])
 		db.session.add(testuser)
-		testadmin = User(loginname='testadmin', unix_uid=10001, password='adminpassword', primary_email_address='admin@example.com', displayname='Test Admin', groups=[users_group, access_group, admin_group])
+		testadmin = User(loginname='testadmin', unix_uid=10001, uuid=UUID('e5555555-5555-5555-5555-555555555555'), password='adminpassword', primary_email_address='admin@example.com', displayname='Test Admin', groups=[users_group, access_group, admin_group])
 		db.session.add(testadmin)
 		testmail = Mail(uid='test', receivers=['test1@example.com', 'test2@example.com'], destinations=['testuser@mail.example.com'])
 		db.session.add(testmail)

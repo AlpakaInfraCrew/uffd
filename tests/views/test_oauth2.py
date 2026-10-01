@@ -40,6 +40,7 @@ class TestViews(UffdTestCase):
 		self.assertEqual(r.content_type, 'application/json')
 		user = self.get_user()
 		self.assertEqual(r.json['id'], user.unix_uid)
+		self.assertEqual(r.json['uuid'], str(user.uuid))
 		self.assertEqual(r.json['name'], user.displayname)
 		self.assertEqual(r.json['nickname'], user.loginname)
 		self.assertEqual(r.json['email'], mail or user.primary_email.address)
@@ -381,7 +382,7 @@ class TestOIDCConfigurationProfile(UffdTestCase):
 class TestOIDCBasicProfile(UffdTestCase):
 	def setUpDB(self):
 		db.session.add(OAuth2Key(**TEST_JWK))
-		db.session.add(OAuth2Client(service=Service(name='test', limit_access=False), client_id='test', client_secret='testsecret', redirect_uris=['https://service/callback']))
+		db.session.add(OAuth2Client(service=Service(name='test', limit_access=False), client_id='test', client_secret='testsecret', redirect_uris=['https://service/callback'], use_uuid_as_sub=True))
 
 	# Helper
 	def validate_claim_syntax(self, name, value):
@@ -568,6 +569,21 @@ class TestOIDCBasicProfile(UffdTestCase):
 		args = self.validate_auth_response(r)
 		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
 		id_token = self.validate_token_response(r)
+		self.assertEqual(id_token['sub'], 'd4444444-4444-4444-4444-444444444444')
+		r = self.do_userinfo_request(r.json['access_token'])
+		self.validate_userinfo_response(r)
+		self.assertEqual(r.json['sub'], 'd4444444-4444-4444-4444-444444444444')
+
+	def test_legacy_sub(self):
+		client = OAuth2Client.query.filter_by(client_id='test').first()
+		client.use_uuid_as_sub = False
+		db.session.add(client)
+		db.session.commit()
+		self.login_as('user')
+		r = self.do_auth_request(response_type='code')
+		args = self.validate_auth_response(r)
+		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
+		id_token = self.validate_token_response(r)
 		self.assertEqual(id_token['sub'], '10000')
 		r = self.do_userinfo_request(r.json['access_token'])
 		self.validate_userinfo_response(r)
@@ -579,7 +595,7 @@ class TestOIDCBasicProfile(UffdTestCase):
 		args = self.validate_auth_response(r)
 		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
 		id_token = self.validate_token_response(r)
-		self.assertEqual(id_token['sub'], '10000')
+		self.assertEqual(id_token['sub'], 'd4444444-4444-4444-4444-444444444444')
 
 	def test_no_state(self):
 		self.login_as('user')
@@ -587,7 +603,7 @@ class TestOIDCBasicProfile(UffdTestCase):
 		args = self.validate_auth_response(r, state=None)
 		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
 		id_token = self.validate_token_response(r)
-		self.assertEqual(id_token['sub'], '10000')
+		self.assertEqual(id_token['sub'], 'd4444444-4444-4444-4444-444444444444')
 
 	def test_no_nonce(self):
 		self.login_as('user')
@@ -595,7 +611,7 @@ class TestOIDCBasicProfile(UffdTestCase):
 		args = self.validate_auth_response(r)
 		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
 		id_token = self.validate_token_response(r, nonce=None)
-		self.assertEqual(id_token['sub'], '10000')
+		self.assertEqual(id_token['sub'], 'd4444444-4444-4444-4444-444444444444')
 
 	def test_redirect_uri(self):
 		self.login_as('user')
@@ -604,7 +620,7 @@ class TestOIDCBasicProfile(UffdTestCase):
 		args = self.validate_auth_response(r)
 		r = self.do_token_request(grant_type='authorization_code', code=args['code'], redirect_uri=None)
 		id_token = self.validate_token_response(r)
-		self.assertEqual(id_token['sub'], '10000')
+		self.assertEqual(id_token['sub'], 'd4444444-4444-4444-4444-444444444444')
 		# If auth request has redirect_uri, it is required in token request
 		r = self.do_auth_request(response_type='code')
 		args = self.validate_auth_response(r)
@@ -806,15 +822,15 @@ class TestOIDCBasicProfile(UffdTestCase):
 		# GET + Bearer
 		r = self.client.get(path=url_for('oauth2.userinfo'), headers=[('Authorization', 'Bearer %s'%access_token)], follow_redirects=True)
 		self.validate_userinfo_response(r)
-		self.assertEqual(r.json['sub'], '10000')
+		self.assertEqual(r.json['sub'], 'd4444444-4444-4444-4444-444444444444')
 		# POST + Bearer
 		r = self.client.post(path=url_for('oauth2.userinfo'), headers=[('Authorization', 'Bearer %s'%access_token)], follow_redirects=True)
 		self.validate_userinfo_response(r)
-		self.assertEqual(r.json['sub'], '10000')
+		self.assertEqual(r.json['sub'], 'd4444444-4444-4444-4444-444444444444')
 		# "Bearer" is case-insensitive
 		r = self.client.post(path=url_for('oauth2.userinfo'), headers=[('authorization', 'bearer %s'%access_token)], follow_redirects=True)
 		self.validate_userinfo_response(r)
-		self.assertEqual(r.json['sub'], '10000')
+		self.assertEqual(r.json['sub'], 'd4444444-4444-4444-4444-444444444444')
 		# Invalid auth scheme
 		r = self.client.post(path=url_for('oauth2.userinfo'), headers=[('Authorization', 'Basic dGVzdDp0ZXN0c2VjcmV0')], follow_redirects=True)
 		self.assert_userinfo_error(r)
@@ -826,11 +842,11 @@ class TestOIDCBasicProfile(UffdTestCase):
 		# POST + body
 		r = self.client.post(path=url_for('oauth2.userinfo'), data={'access_token': access_token}, follow_redirects=True)
 		self.validate_userinfo_response(r)
-		self.assertEqual(r.json['sub'], '10000')
+		self.assertEqual(r.json['sub'], 'd4444444-4444-4444-4444-444444444444')
 		# GET + query
 		r = self.client.get(path=url_for('oauth2.userinfo', access_token=access_token), follow_redirects=True)
 		self.validate_userinfo_response(r)
-		self.assertEqual(r.json['sub'], '10000')
+		self.assertEqual(r.json['sub'], 'd4444444-4444-4444-4444-444444444444')
 		# POST + Bearer + body -> REJECT
 		r = self.client.post(path=url_for('oauth2.userinfo'), data={'access_token': access_token}, headers=[('Authorization', 'Bearer %s'%access_token)], follow_redirects=True)
 		self.assert_userinfo_error(r)
@@ -845,10 +861,10 @@ class TestOIDCBasicProfile(UffdTestCase):
 		args = self.validate_auth_response(r)
 		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
 		id_token = self.validate_token_response(r)
-		self.assertEqual(id_token['sub'], '10000')
+		self.assertEqual(id_token['sub'], 'd4444444-4444-4444-4444-444444444444')
 		r = self.do_userinfo_request(r.json['access_token'])
 		self.validate_userinfo_response(r)
-		self.assertEqual(r.json['sub'], '10000')
+		self.assertEqual(r.json['sub'], 'd4444444-4444-4444-4444-444444444444')
 		self.assertEqual(r.json['name'], 'Test User')
 		self.assertEqual(r.json['preferred_username'], 'testuser')
 		self.assertEqual(r.json['email'], 'test@example.com')
@@ -861,13 +877,13 @@ class TestOIDCBasicProfile(UffdTestCase):
 		args = self.validate_auth_response(r)
 		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
 		id_token = self.validate_token_response(r)
-		self.assertEqual(id_token['sub'], '10000')
+		self.assertEqual(id_token['sub'], 'd4444444-4444-4444-4444-444444444444')
 		self.assertEqual(id_token['preferred_username'], 'testuser')
 		self.assertEqual(id_token['email'], 'test@example.com')
 		self.assertNotIn('name', r.json)
 		r = self.do_userinfo_request(r.json['access_token'])
 		self.validate_userinfo_response(r)
-		self.assertEqual(r.json['sub'], '10000')
+		self.assertEqual(r.json['sub'], 'd4444444-4444-4444-4444-444444444444')
 		self.assertEqual(r.json['name'], 'Test User')
 		self.assertNotIn('email', r.json)
 
@@ -907,6 +923,38 @@ class TestOIDCBasicProfile(UffdTestCase):
 		self.assertGreater(id_token['auth_time'] - auth_time, -2)
 
 	def test_sub_value(self):
+		# Via id_token_hint or claims.id_token.sub.value
+		self.login_as('user')
+		r = self.do_auth_request(response_type='code', prompt='none')
+		args = self.validate_auth_response(r)
+		r = self.do_token_request(grant_type='authorization_code', code=args['code'])
+		self.validate_token_response(r)
+		id_token = r.json['id_token']
+		r = self.do_auth_request(response_type='code', prompt='none', id_token_hint=id_token)
+		args = self.validate_auth_response(r)
+		self.assertIn('code', args)
+		r = self.do_auth_request(response_type='code', prompt='none', id_token_hint='XXXXX')
+		self.assert_auth_error(r, 'invalid_request')
+		r = self.do_auth_request(response_type='code', prompt='none', claims='{"id_token": {"sub": {"value": "d4444444-4444-4444-4444-444444444444"}}}')
+		args = self.validate_auth_response(r)
+		r = self.do_auth_request(response_type='code', prompt='none', claims='{"id_token": {"sub": {"value": "e5555555-5555-5555-5555-555555555555"}}}')
+		self.assert_auth_error(r, 'login_required')
+		# sub value in id_token_hint and claims is the same -> Not ambiguous
+		r = self.do_auth_request(response_type='code', prompt='none', id_token_hint=id_token, claims='{"id_token": {"sub": {"value": "d4444444-4444-4444-4444-444444444444"}}}')
+		args = self.validate_auth_response(r)
+		self.assertIn('code', args)
+		# sub value in id_token_hint and claims differs -> Ambiguous
+		r = self.do_auth_request(response_type='code', prompt='none', id_token_hint=id_token, claims='{"id_token": {"sub": {"value": "e5555555-5555-5555-5555-555555555555"}}}')
+		self.assert_auth_error(r, 'invalid_request')
+		self.login_as('admin')
+		r = self.do_auth_request(response_type='code', prompt='none', id_token_hint=id_token)
+		self.assert_auth_error(r, 'login_required')
+
+	def test_sub_value_legacy_sub(self):
+		client = OAuth2Client.query.filter_by(client_id='test').first()
+		client.use_uuid_as_sub = False
+		db.session.add(client)
+		db.session.commit()
 		# Via id_token_hint or claims.id_token.sub.value
 		self.login_as('user')
 		r = self.do_auth_request(response_type='code', prompt='none')

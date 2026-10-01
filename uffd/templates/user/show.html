@@ -60,11 +60,7 @@
 					<span class="badge badge-secondary">{{_('service')}}</span>
 					{% endif %}
 				</label>
-				{% if user.id %}
-				<input type="number" class="form-control" id="user-uid" name="uid" value="{{ user.unix_uid }}" readonly>
-				{% else %}
-				<input type="text" class="form-control" id="user-uid" name="uid" placeholder="{{_('will be chosen')}}" readonly>
-				{% endif %}
+				<input type="text" class="form-control" id="user-uid" name="uid" placeholder="{{ _('automatically chosen') }}" value="{{ user.unix_uid or '' }}" readonly>
 			</div>
 			{% if not user.id %}
 			<div class="form-group col">
@@ -74,6 +70,12 @@
 				</div>
 			</div>
 			{% endif %}
+			<div class="form-group col">
+				<label for="user-uuid">
+					{{_('UUID')}}
+				</label>
+				<input type="text" class="form-control" id="user-uuid" name="uuid" placeholder="{{ _('automatically chosen') }}" value="{{ user.uuid or '' }}" readonly>
+			</div>
 			<div class="form-group col">
 				<label for="user-loginname">{{_("Login Name")}}</label>
 				<input type="text" class="form-control" id="user-loginname" name="loginname" value="{{ user.loginname or '' }}" {% if user.id %}readonly{% endif %}>

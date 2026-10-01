@@ -130,19 +130,43 @@ class TestAPIGetusers(UffdTestCase):
 		r = self.client.get(path=url_for('api.getusers'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
-			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
+			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'uuid': 'd4444444-4444-4444-4444-444444444444', 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
+			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'uuid': 'e5555555-5555-5555-5555-555555555555', 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
 		])
 
 	def test_id(self):
 		r = self.client.get(path=url_for('api.getusers', id=10000), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
+			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'uuid': 'd4444444-4444-4444-4444-444444444444', 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
 		])
 
 	def test_id_empty(self):
 		r = self.client.get(path=url_for('api.getusers', id=0), headers=[basic_auth('test', 'test')], follow_redirects=True)
+		self.assertEqual(r.status_code, 200)
+		self.assertEqual(r.json, [])
+
+	def test_uuid(self):
+		r = self.client.get(path=url_for('api.getusers', uuid='d4444444-4444-4444-4444-444444444444'), headers=[basic_auth('test', 'test')], follow_redirects=True)
+		self.assertEqual(r.status_code, 200)
+		self.assertEqual(self.fix_result(r.json), [
+			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'uuid': 'd4444444-4444-4444-4444-444444444444', 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
+		])
+
+	def test_uuid_uppercase(self):
+		r = self.client.get(path=url_for('api.getusers', uuid='D4444444-4444-4444-4444-444444444444'), headers=[basic_auth('test', 'test')], follow_redirects=True)
+		self.assertEqual(r.status_code, 200)
+		self.assertEqual(self.fix_result(r.json), [
+			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'uuid': 'd4444444-4444-4444-4444-444444444444', 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
+		])
+
+	def test_uuid_empty(self):
+		r = self.client.get(path=url_for('api.getusers', uuid=''), headers=[basic_auth('test', 'test')], follow_redirects=True)
+		self.assertEqual(r.status_code, 200)
+		self.assertEqual(r.json, [])
+
+	def test_uuid_invalid(self):
+		r = self.client.get(path=url_for('api.getusers', uuid='foobar'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(r.json, [])
 
@@ -156,14 +180,14 @@ class TestAPIGetusers(UffdTestCase):
 		self.assertEqual(r.status_code, 200)
 		service = Service.query.filter_by(name='test').one()
 		self.assertEqual(self.fix_result(r.json), [
-			{'displayname': 'Test User', 'email': remailer.build_v1_address(service.id, user.id), 'id': 10000, 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
+			{'displayname': 'Test User', 'email': remailer.build_v1_address(service.id, user.id), 'id': 10000, 'uuid': 'd4444444-4444-4444-4444-444444444444', 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
 		])
 
 	def test_loginname(self):
 		r = self.client.get(path=url_for('api.getusers', loginname='testuser'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
+			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'uuid': 'd4444444-4444-4444-4444-444444444444', 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
 		])
 
 	def test_loginname_empty(self):
@@ -175,7 +199,7 @@ class TestAPIGetusers(UffdTestCase):
 		r = self.client.get(path=url_for('api.getusers', email='admin@example.com'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
+			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'uuid': 'e5555555-5555-5555-5555-555555555555', 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
 		])
 
 	def test_email_with_remailer(self):
@@ -188,7 +212,7 @@ class TestAPIGetusers(UffdTestCase):
 		self.assertEqual(r.status_code, 200)
 		service = Service.query.filter_by(name='test').one()
 		self.assertEqual(self.fix_result(r.json), [
-			{'displayname': 'Test Admin', 'email': remailer.build_v1_address(service.id, user.id), 'id': 10001, 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
+			{'displayname': 'Test Admin', 'email': remailer.build_v1_address(service.id, user.id), 'id': 10001, 'uuid': 'e5555555-5555-5555-5555-555555555555', 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
 		])
 
 	def test_email_empty(self):
@@ -200,7 +224,7 @@ class TestAPIGetusers(UffdTestCase):
 		r = self.client.get(path=url_for('api.getusers', group='uffd_admin'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
+			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'uuid': 'e5555555-5555-5555-5555-555555555555', 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
 		])
 
 	def test_group_empty(self):
@@ -214,15 +238,15 @@ class TestAPIGetusers(UffdTestCase):
 		r = self.client.get(path=url_for('api.getusers'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
-			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
+			{'displayname': 'Test User', 'email': 'test@example.com', 'id': 10000, 'uuid': 'd4444444-4444-4444-4444-444444444444', 'loginname': 'testuser', 'groups': ['uffd_access', 'users']},
+			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'uuid': 'e5555555-5555-5555-5555-555555555555', 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
 		])
 		Service.query.filter_by(name='test').first().hide_deactivated_users = True
 		db.session.commit()
 		r = self.client.get(path=url_for('api.getusers'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
+			{'displayname': 'Test Admin', 'email': 'admin@example.com', 'id': 10001, 'uuid': 'e5555555-5555-5555-5555-555555555555', 'loginname': 'testadmin', 'groups': ['uffd_access', 'uffd_admin', 'users']}
 		])
 
 class TestAPIGetgroups(UffdTestCase):
@@ -239,9 +263,9 @@ class TestAPIGetgroups(UffdTestCase):
 		r = self.client.get(path=url_for('api.getgroups'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'id': 20001, 'members': ['testadmin', 'testuser'], 'name': 'users'},
-			{'id': 20002, 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
-			{'id': 20003, 'members': ['testadmin'], 'name': 'uffd_admin'}
+			{'id': 20001, 'uuid': 'a1111111-1111-1111-1111-111111111111', 'members': ['testadmin', 'testuser'], 'name': 'users'},
+			{'id': 20002, 'uuid': 'b2222222-2222-2222-2222-222222222222', 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
+			{'id': 20003, 'uuid': 'c3333333-3333-3333-3333-333333333333', 'members': ['testadmin'], 'name': 'uffd_admin'}
 		])
 
 	def test_all_deactivated_members(self):
@@ -250,25 +274,25 @@ class TestAPIGetgroups(UffdTestCase):
 		r = self.client.get(path=url_for('api.getgroups'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'id': 20001, 'members': ['testadmin', 'testuser'], 'name': 'users'},
-			{'id': 20002, 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
-			{'id': 20003, 'members': ['testadmin'], 'name': 'uffd_admin'}
+			{'id': 20001, 'uuid': 'a1111111-1111-1111-1111-111111111111', 'members': ['testadmin', 'testuser'], 'name': 'users'},
+			{'id': 20002, 'uuid': 'b2222222-2222-2222-2222-222222222222', 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
+			{'id': 20003, 'uuid': 'c3333333-3333-3333-3333-333333333333', 'members': ['testadmin'], 'name': 'uffd_admin'}
 		])
 		Service.query.filter_by(name='test').first().hide_deactivated_users = True
 		db.session.commit()
 		r = self.client.get(path=url_for('api.getgroups'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'id': 20001, 'members': ['testadmin'], 'name': 'users'},
-			{'id': 20002, 'members': ['testadmin'], 'name': 'uffd_access'},
-			{'id': 20003, 'members': ['testadmin'], 'name': 'uffd_admin'}
+			{'id': 20001, 'uuid': 'a1111111-1111-1111-1111-111111111111', 'members': ['testadmin'], 'name': 'users'},
+			{'id': 20002, 'uuid': 'b2222222-2222-2222-2222-222222222222', 'members': ['testadmin'], 'name': 'uffd_access'},
+			{'id': 20003, 'uuid': 'c3333333-3333-3333-3333-333333333333', 'members': ['testadmin'], 'name': 'uffd_admin'}
 		])
 
 	def test_id(self):
 		r = self.client.get(path=url_for('api.getgroups', id=20002), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'id': 20002, 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
+			{'id': 20002, 'uuid': 'b2222222-2222-2222-2222-222222222222', 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
 		])
 
 	def test_id_empty(self):
@@ -276,11 +300,35 @@ class TestAPIGetgroups(UffdTestCase):
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(r.json, [])
 
+	def test_uuid(self):
+		r = self.client.get(path=url_for('api.getgroups', uuid='b2222222-2222-2222-2222-222222222222'), headers=[basic_auth('test', 'test')], follow_redirects=True)
+		self.assertEqual(r.status_code, 200)
+		self.assertEqual(self.fix_result(r.json), [
+			{'id': 20002, 'uuid': 'b2222222-2222-2222-2222-222222222222', 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
+		])
+
+	def test_uuid_uppercase(self):
+		r = self.client.get(path=url_for('api.getgroups', uuid='B2222222-2222-2222-2222-222222222222'), headers=[basic_auth('test', 'test')], follow_redirects=True)
+		self.assertEqual(r.status_code, 200)
+		self.assertEqual(self.fix_result(r.json), [
+			{'id': 20002, 'uuid': 'b2222222-2222-2222-2222-222222222222', 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
+		])
+
+	def test_uuid_empty(self):
+		r = self.client.get(path=url_for('api.getgroups', uuid=''), headers=[basic_auth('test', 'test')], follow_redirects=True)
+		self.assertEqual(r.status_code, 200)
+		self.assertEqual(r.json, [])
+
+	def test_uuid_invalid(self):
+		r = self.client.get(path=url_for('api.getgroups', uuid='foobar'), headers=[basic_auth('test', 'test')], follow_redirects=True)
+		self.assertEqual(r.status_code, 200)
+		self.assertEqual(r.json, [])
+
 	def test_name(self):
 		r = self.client.get(path=url_for('api.getgroups', name='uffd_admin'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'id': 20003, 'members': ['testadmin'], 'name': 'uffd_admin'}
+			{'id': 20003, 'uuid': 'c3333333-3333-3333-3333-333333333333', 'members': ['testadmin'], 'name': 'uffd_admin'}
 		])
 
 	def test_name_empty(self):
@@ -292,8 +340,8 @@ class TestAPIGetgroups(UffdTestCase):
 		r = self.client.get(path=url_for('api.getgroups', member='testuser'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'id': 20001, 'members': ['testadmin', 'testuser'], 'name': 'users'},
-			{'id': 20002, 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
+			{'id': 20001, 'uuid': 'a1111111-1111-1111-1111-111111111111', 'members': ['testadmin', 'testuser'], 'name': 'users'},
+			{'id': 20002, 'uuid': 'b2222222-2222-2222-2222-222222222222', 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
 		])
 
 	def test_member_empty(self):
@@ -307,8 +355,8 @@ class TestAPIGetgroups(UffdTestCase):
 		r = self.client.get(path=url_for('api.getgroups', member='testuser'), headers=[basic_auth('test', 'test')], follow_redirects=True)
 		self.assertEqual(r.status_code, 200)
 		self.assertEqual(self.fix_result(r.json), [
-			{'id': 20001, 'members': ['testadmin', 'testuser'], 'name': 'users'},
-			{'id': 20002, 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
+			{'id': 20001, 'uuid': 'a1111111-1111-1111-1111-111111111111', 'members': ['testadmin', 'testuser'], 'name': 'users'},
+			{'id': 20002, 'uuid': 'b2222222-2222-2222-2222-222222222222', 'members': ['testadmin', 'testuser'], 'name': 'uffd_access'},
 		])
 		Service.query.filter_by(name='test').first().hide_deactivated_users = True
 		db.session.commit()

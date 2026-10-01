@@ -2,6 +2,7 @@ import string
 import re
 import datetime
 import unicodedata
+from uuid import uuid4
 
 from flask import current_app
 from flask_babel import lazy_gettext
@@ -10,7 +11,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, DateT
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from uffd.database import db
+from uffd.database import db, Uuid
 from uffd.remailer import remailer
 from uffd.utils import token_urlfriendly
 from uffd.password_hash import PasswordHashAttribute, LowEntropyPasswordHash, HighEntropyPasswordHash
@@ -130,6 +131,8 @@ class User(db.Model):
 		if self.unix_uid != value and value is not None:
 			self.unix_uid_allocator.allocate(value)
 		return value
+
+	uuid = Column(Uuid(), unique=True, nullable=False, default=uuid4)
 
 	loginname = Column(String(32), unique=True, nullable=False)
 	displayname = Column(String(128), nullable=False)
@@ -395,6 +398,8 @@ class Group(db.Model):
 		if self.unix_gid != value and value is not None:
 			self.unix_gid_allocator.allocate(value)
 		return value
+
+	uuid = Column(Uuid(), unique=True, nullable=False, default=uuid4)
 
 	name = Column(String(32), unique=True, nullable=False)
 	description = Column(String(128), nullable=False, default='')

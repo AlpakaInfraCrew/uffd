@@ -50,6 +50,15 @@
 			</small>
 		</div>
 
+		<div class="form-group col">
+			<label for="access-group">{{ _('OpenID Connect sub value') }}</label>
+			<select class="form-control" id="use-uuid-as-sub" name="use_uuid_as_sub">
+				{% set use_uuid_as_sub = client.use_uuid_as_sub or not client.db_id %}
+				<option value="" {{ 'selected' if not use_uuid_as_sub }}>{{ _('Unix UID') }}</option>
+				<option value="1" {{ 'selected' if use_uuid_as_sub }}>{{ _('UUID (recommended)') }}</option>
+			</select>
+		</div>
+
 	</form>
 </div>
 {% endblock %}

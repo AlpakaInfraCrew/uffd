@@ -105,6 +105,7 @@ The only OAuth2 scope supported is `profile`. The userinfo endpoint returns json
 ```
 {
   "id": 10000,
+  "uuid": "6b908b1f-0779-4913-b931-7b206ca270f2",
   "name": "Test User",
   "nickname": "testuser"
   "email": "testuser@example.com",
@@ -139,7 +140,7 @@ Supported scopes:
 
 Supported claims:
 
-* `sub` (string): Decimal encoded numeric (Unix) user id
+* `sub` (string): UUID or decimal encoded numeric (Unix) user id (configurable)
 * `name` (string): Display name
 * `preferred_username`(string): Loginname
 * `email` (string): Service-specific or primary email address
