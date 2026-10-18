@@ -48,11 +48,6 @@ class TestServiceUser(UffdTestCase):
 		service.remailer_mode = RemailerMode.ENABLED_V2
 		service_user = ServiceUser.query.get((service.id, user.id))
 		self.assertEqual(service_user.effective_remailer_mode, RemailerMode.ENABLED_V2)
-		self.app.config['REMAILER_LIMIT_TO_USERS'] = ['testadmin']
-		self.assertEqual(service_user.effective_remailer_mode, RemailerMode.DISABLED)
-		self.app.config['REMAILER_LIMIT_TO_USERS'] = ['testuser']
-		self.assertEqual(service_user.effective_remailer_mode, RemailerMode.ENABLED_V2)
-		self.app.config['REMAILER_LIMIT_TO_USERS'] = None
 		service_user.remailer_overwrite_mode = RemailerMode.ENABLED_V1
 		service.remailer_mode = RemailerMode.DISABLED
 		self.assertEqual(service_user.effective_remailer_mode, RemailerMode.ENABLED_V1)
@@ -115,23 +110,15 @@ class TestServiceUser(UffdTestCase):
 		# 2. remailer setup + remailer disabled
 		self.app.config['REMAILER_DOMAIN'] = 'remailer.example.com'
 		self.assertEqual(service_user.email, user.primary_email.address)
-		# 3. remailer setup + remailer enabled + REMAILER_LIMIT_TO_USERS unset
+		# 3. remailer setup + remailer enabled
 		service.remailer_mode = RemailerMode.ENABLED_V1
 		db.session.commit()
 		self.assertEqual(service_user.email, remailer_email)
-		# 4. remailer setup + remailer enabled + REMAILER_LIMIT_TO_USERS does not include user
-		self.app.config['REMAILER_LIMIT_TO_USERS'] = ['testadmin']
-		self.assertEqual(service_user.email, user.primary_email.address)
-		# 5. remailer setup + remailer enabled + REMAILER_LIMIT_TO_USERS includes user
-		self.app.config['REMAILER_LIMIT_TO_USERS'] = ['testuser']
-		self.assertEqual(service_user.email, remailer_email)
-		# 6. remailer setup + remailer disabled + user overwrite
-		self.app.config['REMAILER_LIMIT_TO_USERS'] = None
+		# 4. remailer setup + remailer disabled + user overwrite
 		service.remailer_mode = RemailerMode.DISABLED
 		service_user.remailer_overwrite_mode = RemailerMode.ENABLED_V1
 		self.assertEqual(service_user.email, remailer_email)
-		# 7. remailer setup + remailer enabled + user overwrite
-		self.app.config['REMAILER_LIMIT_TO_USERS'] = None
+		# 5. remailer setup + remailer enabled + user overwrite
 		service.remailer_mode = RemailerMode.ENABLED_V1
 		service_user.remailer_overwrite_mode = RemailerMode.DISABLED
 		self.assertEqual(service_user.email, user.primary_email.address)
@@ -158,8 +145,6 @@ class TestServiceUser(UffdTestCase):
 			],
 			# REMAILER_DOMAIN config
 			[None, 'remailer.example.com'],
-			# REMAILER_LIMIT config
-			[None, ['testuser', 'otheruser'], ['testadmin', 'otheruser']],
 			# service.remailer_mode
 			[RemailerMode.DISABLED, RemailerMode.ENABLED_V1, RemailerMode.ENABLED_V2],
 			# service.enable_email_preferences
@@ -174,12 +159,11 @@ class TestServiceUser(UffdTestCase):
 		for options in cases:
 			value = options[0]
 			self.app.config['REMAILER_DOMAIN'] = options[1]
-			self.app.config['REMAILER_LIMIT_TO_USERS'] = options[2]
-			service.remailer_mode = options[3]
-			service.enable_email_preferences = options[4]
-			service.limit_access, service.access_group = options[5]
-			service_user.service_email = options[6]
-			service_user.remailer_overwrite_mode = options[7]
+			service.remailer_mode = options[2]
+			service.enable_email_preferences = options[3]
+			service.limit_access, service.access_group = options[4]
+			service_user.service_email = options[5]
+			service_user.remailer_overwrite_mode = options[6]
 			a = {result for result in all_service_users if result.email == value}
 			b = set(ServiceUser.filter_query_by_email(ServiceUser.query, value).all())
 			if a != b:

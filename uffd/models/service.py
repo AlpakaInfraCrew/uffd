@@ -69,9 +69,6 @@ class ServiceUser(db.Model):
 	def effective_remailer_mode(self):
 		if not remailer.configured:
 			return RemailerMode.DISABLED
-		if current_app.config['REMAILER_LIMIT_TO_USERS'] is not None:
-			if self.user.loginname not in current_app.config['REMAILER_LIMIT_TO_USERS']:
-				return RemailerMode.DISABLED
 		if self.remailer_overwrite_mode is not None:
 			return self.remailer_overwrite_mode
 		return self.service.remailer_mode
@@ -148,11 +145,6 @@ class ServiceUser(db.Model):
 
 		remailer_enabled = db.case(
 			(db.not_(remailer.configured), False),
-			(
-				db.not_(AliasedUser.loginname.in_(current_app.config['REMAILER_LIMIT_TO_USERS']))
-					if current_app.config['REMAILER_LIMIT_TO_USERS'] is not None else db.and_(False),
-				False
-			),
 			(cls.remailer_overwrite_mode != None, cls.remailer_overwrite_mode != RemailerMode.DISABLED),
 			else_=(AliasedService.remailer_mode != RemailerMode.DISABLED)
 		)
