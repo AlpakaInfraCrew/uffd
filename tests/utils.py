@@ -6,7 +6,7 @@ from flask import url_for
 import flask_migrate
 
 from uffd import create_app, db
-from uffd.models import User, Group, Mail
+from uffd.models import User, Group
 
 def dump(basename, resp):
 	basename = basename.replace('.', '_').replace('/', '_')
@@ -122,8 +122,6 @@ class UffdTestCase(AppTestCase):
 		db.session.add(testuser)
 		testadmin = User(loginname='testadmin', unix_uid=10001, uuid=UUID('e5555555-5555-5555-5555-555555555555'), password='adminpassword', primary_email_address='admin@example.com', displayname='Test Admin', groups=[users_group, access_group, admin_group])
 		db.session.add(testadmin)
-		testmail = Mail(uid='test', receivers=['test1@example.com', 'test2@example.com'], destinations=['testuser@mail.example.com'])
-		db.session.add(testmail)
 		self.setUpDB()
 		db.session.commit()
 
@@ -148,9 +146,6 @@ class UffdTestCase(AppTestCase):
 
 	def get_users_group(self):
 		return Group.query.filter_by(name='users').one_or_none()
-
-	def get_mail(self):
-		return Mail.query.filter_by(uid='test').one_or_none()
 
 	def login_as(self, user, ref=None):
 		# It is currently not possible to login while already logged in as another

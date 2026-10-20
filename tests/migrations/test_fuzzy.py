@@ -36,6 +36,7 @@ class TestFuzzy(MigrationTestCase):
 				'scopes': ['checkpassword', 'getusers', 'getmails']
 			},
 		}
+		self.app.config['DELETE_ALL_MAIL_FORWARDINGS'] = True
 
 	# Runs every upgrade/downgrade script with data. To do this we first upgrade
 	# to head, create data, then downgrade, upgrade, downgrade for every revision.

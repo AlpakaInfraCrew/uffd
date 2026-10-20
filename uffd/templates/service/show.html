@@ -150,7 +150,7 @@
 						</a>
 					</td>
 					<td>
-						{% for perm in ['users', 'checkpassword', 'mail_aliases', 'remailer'] if client.has_permission(perm) %}
+						{% for perm in ['users', 'checkpassword', 'remailer'] if client.has_permission(perm) %}
 						{{ perm }}{{ ',' if not loop.last }}
 						{% endfor %}
 					</td>

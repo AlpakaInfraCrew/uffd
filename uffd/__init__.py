@@ -62,7 +62,7 @@ def create_app(test_config=None): # pylint: disable=too-many-locals,too-many-sta
 		positions = ["service", "selfservice"]
 	else:
 		positions = ["selfservice", "service"]
-	positions += ["rolemod", "invite", "user", "group", "role", "mail"]
+	positions += ["rolemod", "invite", "user", "group", "role"]
 	setup_navbar(app, positions)
 
 	app.register_blueprint(csrf_bp)

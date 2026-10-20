@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-12 23:05+0200\n"
+"POT-Creation-Date: 2026-10-18 20:11+0200\n"
 "PO-Revision-Date: 2021-05-25 21:18+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -157,9 +157,9 @@ msgid "About uffd"
 msgstr "Über uffd"
 
 #: uffd/templates/group/list.html:8 uffd/templates/invite/list.html:6
-#: uffd/templates/mail/list.html:8 uffd/templates/role/list.html:8
-#: uffd/templates/service/index.html:8 uffd/templates/service/show.html:106
-#: uffd/templates/service/show.html:134 uffd/templates/user/list.html:8
+#: uffd/templates/role/list.html:8 uffd/templates/service/index.html:8
+#: uffd/templates/service/show.html:106 uffd/templates/service/show.html:134
+#: uffd/templates/user/list.html:8
 msgid "New"
 msgstr "Neu"
 
@@ -168,8 +168,7 @@ msgid "GID"
 msgstr "GID"
 
 #: uffd/templates/group/list.html:15 uffd/templates/group/show.html:30
-#: uffd/templates/invite/new.html:35 uffd/templates/mail/list.html:14
-#: uffd/templates/mail/show.html:7 uffd/templates/role/list.html:14
+#: uffd/templates/invite/new.html:35 uffd/templates/role/list.html:14
 #: uffd/templates/rolemod/list.html:9 uffd/templates/rolemod/show.html:44
 #: uffd/templates/selfservice/self.html:239
 #: uffd/templates/selfservice/setup_mfa.html:98
@@ -192,17 +191,17 @@ msgstr "Name"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: uffd/templates/group/show.html:8 uffd/templates/mail/show.html:27
-#: uffd/templates/role/show.html:13 uffd/templates/rolemod/show.html:8
-#: uffd/templates/service/api.html:15 uffd/templates/service/oauth2.html:15
-#: uffd/templates/service/show.html:16 uffd/templates/user/show.html:31
+#: uffd/templates/group/show.html:8 uffd/templates/role/show.html:13
+#: uffd/templates/rolemod/show.html:8 uffd/templates/service/api.html:15
+#: uffd/templates/service/oauth2.html:15 uffd/templates/service/show.html:16
+#: uffd/templates/user/show.html:31
 msgid "Save"
 msgstr "Speichern"
 
 #: uffd/templates/group/show.html:9 uffd/templates/invite/new.html:56
-#: uffd/templates/mail/show.html:28 uffd/templates/role/show.html:14
-#: uffd/templates/rolemod/show.html:9 uffd/templates/service/api.html:9
-#: uffd/templates/service/oauth2.html:9 uffd/templates/service/show.html:10
+#: uffd/templates/role/show.html:14 uffd/templates/rolemod/show.html:9
+#: uffd/templates/service/api.html:9 uffd/templates/service/oauth2.html:9
+#: uffd/templates/service/show.html:10
 #: uffd/templates/session/deviceauth.html:39
 #: uffd/templates/session/deviceauth.html:49
 #: uffd/templates/session/devicelogin.html:29
@@ -221,7 +220,6 @@ msgid "Are you sure?"
 msgstr "Wirklich fortfahren?"
 
 #: uffd/templates/group/show.html:11 uffd/templates/group/show.html:13
-#: uffd/templates/mail/show.html:30 uffd/templates/mail/show.html:32
 #: uffd/templates/role/show.html:21 uffd/templates/role/show.html:24
 #: uffd/templates/selfservice/self.html:62
 #: uffd/templates/selfservice/setup_mfa.html:117
@@ -471,26 +469,6 @@ msgstr "Neuen Account registrieren"
 #: uffd/templates/invite/use.html:40
 msgid "Login and add the roles to your account"
 msgstr "Anmelden und die Rollen zu deinem Account hinzufügen"
-
-#: uffd/templates/mail/list.html:15 uffd/templates/mail/show.html:13
-msgid "Receiving addresses"
-msgstr "Empfangsadressen"
-
-#: uffd/templates/mail/list.html:16 uffd/templates/mail/show.html:20
-msgid "Destinations"
-msgstr "Zieladressen"
-
-#: uffd/templates/mail/show.html:16
-msgid ""
-"One address pattern (local+ext@domain, local@domain, local, @domain) per "
-"line. Only lower-case ASCII letters, digits and symbols."
-msgstr ""
-"Ein Adressmuster (local+ext@domain, local@domain, local, @domain) pro "
-"Zeile. Nur ASCII-Kleinbuchstaben, -Ziffern und -Symbole."
-
-#: uffd/templates/mail/show.html:23
-msgid "One address per line"
-msgstr "Eine Adresse pro Zeile"
 
 #: uffd/templates/oauth2/logout.html:10
 msgid "Javascript is required for automatic logout"
@@ -1243,18 +1221,14 @@ msgid "Verify user passwords"
 msgstr "Passwörter von Nutzeraccounts verifizieren"
 
 #: uffd/templates/service/api.html:45
-msgid "Access mail aliases"
-msgstr "Zugriff auf Mail-Weiterleitungen"
-
-#: uffd/templates/service/api.html:49
 msgid "Resolve remailer addresses"
 msgstr "Auflösen von Remailer-Adressen"
 
-#: uffd/templates/service/api.html:51 uffd/templates/service/show.html:55
+#: uffd/templates/service/api.html:47 uffd/templates/service/show.html:55
 msgid "This option has no effect: Remailer config options are unset"
 msgstr "Diese Option hat keine Auswirkung: Remailer ist nicht konfiguriert"
 
-#: uffd/templates/service/api.html:56
+#: uffd/templates/service/api.html:52
 msgid "Access uffd metrics"
 msgstr "Zugriff auf uffd-Metriken"
 
@@ -1855,23 +1829,6 @@ msgstr "Zu viele Anfragen! Bitte warte %(delay)s."
 #: uffd/views/invite.py:199 uffd/views/signup.py:74
 msgid "Could not send mail"
 msgstr "Mailversand fehlgeschlagen"
-
-#: uffd/views/mail.py:21
-msgid "Forwardings"
-msgstr "Weiterleitungen"
-
-#: uffd/views/mail.py:46
-#, python-format
-msgid "Invalid receive address: %(mail_address)s"
-msgstr "Ungültige Empfangsadresse: %(mail_address)s"
-
-#: uffd/views/mail.py:50
-msgid "Mail mapping updated."
-msgstr "Mailweiterleitung geändert."
-
-#: uffd/views/mail.py:59
-msgid "Deleted mail mapping."
-msgstr "Mailweiterleitung gelöscht."
 
 #: uffd/views/oauth2.py:274 uffd/views/selfservice.py:71
 #: uffd/views/session.py:119

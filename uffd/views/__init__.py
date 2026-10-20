@@ -3,7 +3,7 @@ from werkzeug.exceptions import Forbidden
 
 from uffd.secure_redirect import secure_local_redirect
 
-from . import session, selfservice, signup, oauth2, user, group, service, role, invite, api, mail, rolemod
+from . import session, selfservice, signup, oauth2, user, group, service, role, invite, api, rolemod
 
 def init_app(app):
 	@app.errorhandler(403)
@@ -33,7 +33,6 @@ def init_app(app):
 	app.register_blueprint(role.bp)
 	app.register_blueprint(invite.bp)
 	app.register_blueprint(api.bp)
-	app.register_blueprint(mail.bp)
 	app.register_blueprint(rolemod.bp)
 
 	app.add_url_rule("/metrics", view_func=api.prometheus_metrics)

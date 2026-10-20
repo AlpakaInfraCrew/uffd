@@ -41,10 +41,6 @@
 				<label class="form-check-label" for="client-perm-checkpassword"><b>checkpassword</b>: {{_('Verify user passwords')}}</label>
 			</div>
 			<div class="form-check">
-				<input class="form-check-input" type="checkbox" id="client-perm-mail-aliases" name="perm_mail_aliases" value="1" aria-label="enabled" {{ 'checked' if client.perm_mail_aliases }}>
-				<label class="form-check-label" for="client-perm-mail-aliases"><b>mail_aliases</b>: {{_('Access mail aliases')}}</label>
-			</div>
-			<div class="form-check">
 				<input class="form-check-input" type="checkbox" id="client-perm-remailer" name="perm_remailer" value="1" aria-label="enabled" {{ 'checked' if client.perm_remailer }}>
 				<label class="form-check-label" for="client-perm-remailer"><b>remailer</b>: {{_('Resolve remailer addresses')}}</label>
 				{% if not remailer.configured %}

@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request, abort, Response
 
 from uffd.database import db
 from uffd.models import (
-	User, ServiceUser, Group, Mail, MailReceiveAddress, MailDestinationAddress, APIClient,
+	User, ServiceUser, Group, APIClient,
 	RecoveryCodeMethod, TOTPMethod, WebauthnMethod, Invite, Role, Service )
 from .session import login_ratelimit
 
@@ -137,33 +137,6 @@ def checkpassword():
 		service_user.user.password = password
 		db.session.commit()
 	return jsonify(generate_user_dict(service_user))
-
-def generate_mail_dict(mail):
-	return {
-		'name': mail.uid,
-		'receive_addresses': list(mail.receivers),
-		'destination_addresses': list(mail.destinations)
-	}
-
-@bp.route('/getmails', methods=['GET', 'POST'])
-@apikey_required('mail_aliases')
-def getmails():
-	if len(request.values) > 1:
-		abort(400)
-	key = (list(request.values.keys()) or [None])[0]
-	values = request.values.getlist(key)
-	query = Mail.query
-	if key is None:
-		pass
-	elif key == 'name' and len(values) == 1:
-		query = query.filter_by(uid=values[0])
-	elif key == 'receive_address' and len(values) == 1:
-		query = query.filter(Mail.receivers.any(MailReceiveAddress.address==values[0].lower()))
-	elif key == 'destination_address' and len(values) == 1:
-		query = query.filter(Mail.destinations.any(MailDestinationAddress.address==values[0]))
-	else:
-		abort(400)
-	return jsonify([generate_mail_dict(mail) for mail in query])
 
 @bp.route('/resolve-remailer', methods=['GET', 'POST'])
 @apikey_required('remailer')
